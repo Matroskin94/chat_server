@@ -1,0 +1,136 @@
+﻿1. Установка окружения
+	1) Установка npm
+	2) В папке с проектом запускаем npm init
+	3) Инициализируем проект git init
+		* создаём файл .gitignore
+	4) Устанавливаем react react-dom
+		* npm install react react-dom --save
+	5) Устанавливаем webpack
+		* npm install webpack --save
+	6) Устанавливаем ESLint
+		* npm install eslint --save-dev
+	7) Установка babel
+		* npm install babel-loader babel-core --save-dev
+		1. Установить плагин для работы с классами ES6
+			* npm install --save-dev babel-plugin-transform-class-properties
+		2. Установить парсер для eslint
+			* npm install --save-dev babel-eslint
+	8) Установка ESLint
+		* npm install eslint --save-dev
+	9) Установка локального сервера для разработки webpack-dev-server
+		* npm install webpack-dev-server --save-dev
+	10) Установка Redux
+		* npm install redux --save
+	11) Установка Роутера
+		* npm install react-redux --save
+		* npm install react-router --save
+		* npm install react-router-dom --save
+	12) Установка логгера для проверки экшенов
+		* npm install redux-logger --save-dev
+	13) Установка redux-thunk для работы с асинхронными запросами
+		* npm install redux-thunk --save
+		
+	
+2. Настройка дополнительных пакетов 
+	1. Настройка webpack
+		1) Создаём файл webpack.config.js
+			* Настройка точки входа
+				const path = require('path');
+					module.exports = {
+					entry: path.join(__dirname, 'src', 'App.jsx'),
+					output: {
+						path: path.resolve(__dirname, 'public'),
+						filename: 'bundle.js',
+						publicPath: '/'
+					}
+				};
+			* Добавляем лоадер в webpack.configuration.js для babel
+				module: {
+					rules: [
+						{ 
+							test: /\.js$/,
+							exclude: /node_modules/,
+							loader: "babel-loader"
+						}
+					]
+				}
+			* В webpack 4^ в настройках необходимо указать мод разработки
+				mode: 'development'
+					
+		2) В версии webpack 4^ требуется отдельный пакет для работы с webpack в командной строке
+				* npm install webpack-cli -D
+				
+	2. Настройка babel
+		1) Создаём файл .babelrc
+		2) Устанавливаем react-preset
+			* npm install --save-dev babel-preset-react
+			Добавляем присет в .babelrc
+			{
+			  "presets": ["react"]
+			}
+		3) Устанавливаем babel-preset-es2015
+			* npm install --save-dev babel-preset-es2015
+			Добавляем присет в массив "presets"
+			{
+				"presets": [
+					["es2015", { "loose": true, "modules": false }],
+					"react"
+				]
+			}
+		4) Подключить плагины
+			{
+			  "plugins": ["transform-class-properties"]
+			}
+				
+	3. Настройка ESLint
+		1) Запустить команду eslint --init
+		2) Подключение настроек airbnb
+			Необходимые пакеты
+				{ 
+					'eslint': '^4.9.0',
+					'eslint-plugin-import': '^2.7.0',
+					'eslint-plugin-jsx-a11y': '^6.0.2',
+					'eslint-plugin-react': '^7.4.0' 
+				}
+			* npm install --save-dev eslint-config-airbnb eslint@^4.9.0 eslint-plugin-jsx-a11y@^6.0.2 eslint-plugin-import@^2.7.0 eslint-plugin-react@^7.4.0
+		3) Вставить в свойство rules необходимые правила.
+			* В файле .eslintrc втсавить 
+				"extends": "airbnb"
+				"parser": "babel-eslint",
+			
+3. Создание структуры проекта
+	Создание папки src для файлов проекта с точкой входа, которая указывается в webpack.config.js
+		entry: './src/App.jsx',
+		* В папке src будут храниться все исходные файлы приложения
+		
+	/src
+	--/pages			- папка хранящая в себе траницы, которые подключают в себе все внутренние компоненты
+	--/components		- папка с компонентами для каждой страницы
+	--/--component		- папка для конкретного компонента
+	--/constants		- папка для констант необходимых в приложении
+	--/store			- папка для описания хранилища
+	
+	1) Создание redux-хранилища
+		1. В папке хранилища создать файл который будет объекдинять все редьюсеры
+		2. В папке хранилища создать файл с функцией createStore from 'redux', в функцию передать редьюсерыи через функцию applyMiddleWare from 'redux' 
+		добавить мидлвары которые будут использоваться. applyMiddleware(thunk, logger), этот файл должен возвращать функцию initStore, которая запуститься в
+		корневом роутере.
+	
+	2) Создание корневого роутера AppRouter.jsx, который будет описывать маршруты для страниц, а так же прокидывать store всем дочерним компонентам.
+		import React from 'react';
+		import { Provider } from 'react-redux';
+		import { Route, Switch, BrowserRouter } from 'react-router-dom';
+		
+		Необходимо обернуть роутер в следующем порядке
+			<Provider store={store}>
+				<BrowserRouter>
+					<Switch>
+						<Route />
+						...
+						<Route />
+					<Switch>
+				</BrowserRouter>
+			</Provider>
+	2) 
+	
+	
