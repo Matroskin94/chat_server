@@ -47,7 +47,6 @@ class Content extends Component {
 
     render() {
         const { timestamp, message, messageList, status } = this.state;
-        console.log('messageList', messageList);
 
         return (
             <div>

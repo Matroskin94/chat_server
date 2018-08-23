@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Header from '../components/ChatPage/Header.jsx';
-import Content from '../components/ChatPage/Content(WS).jsx';
+import Content from '../components/ChatPage/Content.jsx';
 
 class ChatPage extends PureComponent {
 
