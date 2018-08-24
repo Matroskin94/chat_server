@@ -3,7 +3,8 @@ const usercModel = require('../Models/Users');
 
 function sendResult(err, result, reponse) {
     if (err) {
-        return reponse.status(500).send(err);
+        reponse.set({ 'Content-Type' : 'application/json;charset=UTF-8'});
+        return reponse.status(500).send({ message: err});
     } else {
         return reponse.status(200).send(result);
     }

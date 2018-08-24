@@ -5,7 +5,7 @@ const io = require('socket.io')();
     const date = {
         time: String
     }
-
+    console.log('SOCKET cinnection');
     io.on('connection', (client) => {
         // Генерация событий для клиента
         client.on('subscribeToTimer', (interval) => {

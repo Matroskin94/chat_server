@@ -17,7 +17,7 @@ function startServer() {
     app.listen(8000, () => {
         console.log('Express server started');
     });
-
+// eslint@5.1.0
     // POST: /user - создание нового пользователя
     app.post('/user', userController.createUser);
 
