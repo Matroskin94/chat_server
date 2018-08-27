@@ -10,11 +10,11 @@ MongoClient.connect(
     { useNewUrlParser: true, native_parser: true },
     (err, database) => {
         if (err) {
-            return console.log(err);
+            return err;
         }
         const mongoTestDB = database.db('mongo_test');
         // server = new WebSocket.Server({ port: 8000 });
-        // console.log('Server started');
+
         startServer(mongoTestDB);
         // startService(mongoTestDB);
 });

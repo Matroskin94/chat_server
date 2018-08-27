@@ -42,3 +42,19 @@ export function loginRequestAction(user) {
         });
     };
 }
+
+export function registrationRequestAction(user) {
+    return dispatch => {
+        dispatch(fetchStart());
+
+        return ProfileService.register(user).then(response => {
+            dispatch(fetchEnd());
+            dispatch(loginSuccessAction(response));
+            return response;
+        }).catch(error => {
+            dispatch(fetchEnd());
+
+            throw error;
+        });
+    };
+}

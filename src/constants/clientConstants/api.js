@@ -4,7 +4,7 @@ const BASE_URL = `${HOST}${PORT ? `:${PORT}` : ''}`;
 
 const API = {
   USER: `${BASE_URL}/user`,
-  CHECK_USER: () => `${BASE_URL}/checkUser`
+  CHECK_USER: `${BASE_URL}/checkUser`
 }
 
 export default API;

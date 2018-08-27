@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import login from '../HOC/Login.jsx';
+import authorization from '../HOC/Authorization.jsx';
 import { noop } from '../../clientServices/utils/common';
 
-@login()
+@authorization()
 class Content extends PureComponent {
     static propTypes = {
         onLoginClick: PropTypes.func, // Функция из LoginHOC для авторизации пользователя
@@ -18,20 +18,24 @@ class Content extends PureComponent {
 
     state = {
         name: '',
-        password: ''
+        password: '',
+        profileError: ''
     }
 
     handleLoginClick = () => {
         const { password, name } = { ...this.state };
 
         this.props.onLoginClick({ password, name }).catch(error => {
-            this.setState({ isProfileError: true });
+            this.setState({ profileError: error.message });
         });
     }
 
     handleInputChange = field => event => this.setState({ [field]: event.target.value })
 
     render() {
+        const { profileError } = this.state;
+        const isProfileError = !!profileError;
+
         return (
             <div>
                 <h1>Вход</h1>
@@ -42,6 +46,9 @@ class Content extends PureComponent {
                 <div>
                     <button onClick={this.handleLoginClick}>Войти</button>
                     <Link to='/registration'>Регистрация</Link>
+                </div>
+                <div hidden={!isProfileError}>
+                    {profileError}
                 </div>
             </div>
         );

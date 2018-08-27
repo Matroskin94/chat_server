@@ -1,30 +1,18 @@
-const express = require('express');
 const WebSocket = require('ws');
-const bodyParser = require('body-parser');
-const cors = require('cors');
 
 const db = require('./serverServices/db');
 const userController = require('./serverServices/Controllers/Users');
-
-let server;
-
-const corsOptions = {
-  origin: 'http://localhost:8080',
-  optionsSuccessStatus: 200
-}
+const configureServer = require('./serverServices/serverConfiguration');
 
 db.connect('mongodb://localhost:27017/mongo_test', startServer);
 
 function startServer() {
-    const app = express();
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
-    app.use(cors(corsOptions));
+    const app = configureServer();
 
     app.listen(8000, () => {
         console.log('Express server started');
     });
-// eslint@5.1.0
+
     // POST: /user - создание нового пользователя
     app.post('/user', userController.createUser);
 

@@ -12,7 +12,6 @@ class HttpProvider {
             headers,
             data: JSON.stringify(data)
         }).then( response => {
-            console.log('RESPONSE', response);
             if (response.status >= 400) {
                 const error = new Error(response.statusText);
                 error.response = response;
