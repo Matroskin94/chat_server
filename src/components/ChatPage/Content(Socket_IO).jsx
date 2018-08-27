@@ -23,7 +23,7 @@ class Content extends Component {
     handleInputChange = (e) => {
         this.setState({
             message: e.target.value
-        })
+        });
     }
 
     handleSendMessage = () => {

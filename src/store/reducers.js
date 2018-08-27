@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
-import HomePageReducer from './HomePageReducer';
+import NetworkReducer from '../clientServices/reducers/NetworkReducer';
+import ProfileReducer from '../clientServices/reducers/ProfileReducer';
 
 export default combineReducers({
-    homePageReducer: HomePageReducer
+    networkReducer: NetworkReducer,
+    profileReducer: ProfileReducer
 });

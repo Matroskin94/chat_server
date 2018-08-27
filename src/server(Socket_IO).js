@@ -14,7 +14,6 @@ const io = require('socket.io')();
             }, interval);
         });
         client.on('sendMessage', message => {
-            console.log('Recieved message:', message);
             messageList.push(message);
             client.emit('getMessages', messageList);
         });
@@ -22,5 +21,4 @@ const io = require('socket.io')();
 
     const port = 8000;
     io.listen(port);
-    console.log('listening on port ', port);
 })();

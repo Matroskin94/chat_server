@@ -1,26 +1,34 @@
 const WebSocket = require('ws');
-const MongoClient = require('mongodb').MongoClient;
 
-let server;
+const db = require('./serverServices/db');
+const userController = require('./serverServices/Controllers/Users');
+const configureServer = require('./serverServices/serverConfiguration');
 
-MongoClient.connect(
-    'mongodb://localhost:27017/mongo_test',
-    { useNewUrlParser: true, native_parser: true },
-    (err, database) => {
-        if (err) {
-            return console.log(err);
-        }
-        const mongoTestDB = database.db('mongo_test')
-        server = new WebSocket.Server({ port: 8000 });
-        console.log('Server started');
+db.connect('mongodb://localhost:27017/mongo_test', startServer);
 
-        startService(mongoTestDB);
-});
+function startServer() {
+    const app = configureServer();
 
-function startService(db) {
+    app.listen(8000, () => {
+        console.log('Express server started');
+    });
+
+    // POST: /user - создание нового пользователя
+    app.post('/user', userController.createUser);
+
+    // POST: /checkUser - проверка наличия полльзователя и совпадения пароля
+    app.post('/checkUser', userController.checkUser);
+}
+
+// Поиск по ID
+// const ObjectID = require('mongodb').ObjectID;
+// db.collection('users').findOne({ _id: ObjectID(objID) }, callback(err, ress))
+
+/* function startService(db) {
     server.on('connection', (ws, req) => {
+        console.log('Client connected');
         ws.on('message', message => {
-            db.collection('messages').insert({ messageText: message }, (err, result) => {
+            db.collection('messages').insertOne({ messageText: message }, (err, result) => {
                 if (err) {
                     console.log('ERROR!!', err);
                     result.sendStatus(500);
@@ -33,7 +41,12 @@ function startService(db) {
                 }
             });
         });
+
+        ws.on('close', (code, reason) => {
+            console.log('Disconnected code', code);
+            console.log('Disconnected reason', reason);
+        });
     });
-}
+} */
 
 
