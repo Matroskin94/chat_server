@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const SERVER_MESSAGES = {
     ERROR_SAVING: 'Ошибка сохранения',
     USER_EXISTS: 'Пользователь с таким именем уже существует',

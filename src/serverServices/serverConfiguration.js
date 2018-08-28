@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -12,6 +14,7 @@ function configureServer() {
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(express.static('../../public/'));
     app.use(cors(corsOptions));
 
     return app;

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const express = require('express');
 const WebSocket = require('ws');
 const MongoClient = require('mongodb').MongoClient;

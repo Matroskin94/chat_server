@@ -1,18 +1,22 @@
-const UserSchema = require('../DataShemes/UserSchema');
-const usercModel = require('../Models/Users');
+/* eslint-disable */
+
+const userModel = require('../Models/Users');
 
 function sendResult(err, result, reponse) {
     if (err) {
         return reponse.status(500).send({ message: err});
-    } else {
-        return reponse.status(200).send(result);
     }
+    return reponse.status(200).send(result);
 }
 
 exports.createUser = (req, res) => {
-    usercModel.addUser(req.body, (err, result) => sendResult(err, result, res));
-}
+    userModel.addUser(req.body, (err, result) => sendResult(err, result, res));
+};
 
 exports.checkUser = (req, res) => {
-    usercModel.checkUser(req.body, (err, result) => sendResult(err, result, res));
-}
+    userModel.checkUser(req.body, (err, result) => sendResult(err, result, res));
+};
+
+exports.logoutUser = userId => {
+    userModel.logoutUser(userId);
+};

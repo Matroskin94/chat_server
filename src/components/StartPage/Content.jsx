@@ -8,24 +8,24 @@ import { noop } from '../../clientServices/utils/common';
 @authorization()
 class Content extends PureComponent {
     static propTypes = {
-        onLoginClick: PropTypes.func, // Функция из LoginHOC для авторизации пользователя
-        isFetching: PropTypes.bool // Переменная ожидания ответа от сервера
+        onLoginClick: PropTypes.func // Функция из LoginHOC для авторизации пользователя
     };
+
     static defaultProps = {
-        onLoginClick: noop,
-        isFetching: false
+        onLoginClick: noop
     };
 
     state = {
-        name: '',
+        userLogin: '',
         password: '',
         profileError: ''
     }
 
     handleLoginClick = () => {
-        const { password, name } = { ...this.state };
+        const { password, userLogin } = { ...this.state };
+        const { onLoginClick } = this.props;
 
-        this.props.onLoginClick({ password, name }).catch(error => {
+        onLoginClick({ password, userLogin }).catch(error => {
             this.setState({ profileError: error.message });
         });
     }
@@ -40,11 +40,11 @@ class Content extends PureComponent {
             <div>
                 <h1>Вход</h1>
                 <p>Пользователь</p>
-                <input type='text' onChange={this.handleInputChange('name')} />
+                <input type='text' onChange={this.handleInputChange('userLogin')} />
                 <p>Пароль</p>
                 <input type='password' onChange={this.handleInputChange('password')} />
                 <div>
-                    <button onClick={this.handleLoginClick}>Войти</button>
+                    <button type='button' onClick={this.handleLoginClick}>Войти</button>
                     <Link to='/registration'>Регистрация</Link>
                 </div>
                 <div hidden={!isProfileError}>

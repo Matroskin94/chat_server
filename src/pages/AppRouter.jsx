@@ -19,7 +19,7 @@ const AppRouter = props => (
                     path='/'
                     component={StartPage}
                 />
-                <Route path='/registration' component={RegistrationPage}/>
+                <Route path='/registration' component={RegistrationPage} />
                 <Route path='/chat' component={ChatPage} />
             </Switch>
         </BrowserRouter>

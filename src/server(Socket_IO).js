@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const io = require('socket.io')();
 
 (function(){

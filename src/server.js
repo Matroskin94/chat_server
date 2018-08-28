@@ -1,4 +1,7 @@
-const WebSocket = require('ws');
+/* eslint-disable */
+
+const http = require('http');
+const socket = require('socket.io');
 
 const db = require('./serverServices/db');
 const userController = require('./serverServices/Controllers/Users');
@@ -8,16 +11,25 @@ db.connect('mongodb://localhost:27017/mongo_test', startServer);
 
 function startServer() {
     const app = configureServer();
+    const server = http.Server(app);
+    const io = socket(server);
 
-    app.listen(8000, () => {
+    server.listen(8000);
+
+    /* app.listen(8000, () => {
         console.log('Express server started');
-    });
+    }); */
 
     // POST: /user - создание нового пользователя
     app.post('/user', userController.createUser);
 
     // POST: /checkUser - проверка наличия полльзователя и совпадения пароля
     app.post('/checkUser', userController.checkUser);
+
+    io.on('connection', (socket) => {
+        console.log('Client connected');
+        // socket.on('disconnect', userController.logoutUser);
+    });
 }
 
 // Поиск по ID
