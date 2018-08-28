@@ -16,10 +16,6 @@ function startServer() {
 
     server.listen(8000);
 
-    /* app.listen(8000, () => {
-        console.log('Express server started');
-    }); */
-
     // POST: /user - создание нового пользователя
     app.post('/user', userController.createUser);
 
@@ -28,7 +24,20 @@ function startServer() {
 
     io.on('connection', (socket) => {
         console.log('Client connected');
+        userController.getOnlineUsers().then(result => {
+            socket.broadcast.emit('onlineUsers', result);
+        });
         // socket.on('disconnect', userController.logoutUser);
+        socket.on('getOnlineUsers', () => {
+            userController.getOnlineUsers().then(result => {
+                socket.emit('onlineUsers', result);
+            });
+        });
+
+        socket.on('userConnected', userName => {
+            console.log('userName', userName);
+            socket.broadcast.emit('connectedUser', userName);
+        });
     });
 }
 

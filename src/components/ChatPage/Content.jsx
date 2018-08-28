@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import PropTypes from 'prop-types';
 
 import withUser from '../HOC/WithUser.jsx';
-import UsersList from './PageComponents/UsersList.jsx'
+import UsersList from './PageComponents/UsersList.jsx';
 
 import chatStyles from './styles/chatStyles.css';
 import commonStyles from './styles/commonStyles.css';
@@ -20,15 +20,36 @@ class Content extends Component {
     }
 
     state = {
-        status: 'DISCONNECTED',
+        usersList: [],
         message: '',
+        socket: null,
         messageList: []
     };
 
     componentDidMount() {
-        const socket = io('http://localhost:8000');
+        const sock = io('http://localhost:8000');
+        const { user } = this.props;
 
-        socket.on('connect', () => { console.log('Client connected'); });
+        this.setState({ socket: sock }, () => {
+            const { socket } = this.state;
+
+            socket.on('connect', () => {
+                socket.emit('userConnected', user.userLogin);
+                socket.emit('getOnlineUsers');
+            });
+
+            socket.on('onlineUsers', data => {
+                this.setState({ usersList: data });
+            });
+
+            socket.on('connectedUser', connectedUser => {
+                const message = `${connectedUser} присоедиинился к беседе`;
+
+                this.setState(prevState => ({
+                    messageList: prevState.messageList.concat(message)
+                }));
+            });
+        });
     }
 
     handleInputChange = e => {
@@ -37,38 +58,37 @@ class Content extends Component {
         });
     }
 
-    setStatus = status => {
-        this.setState({
-            status
-        });
+    handleSendMessage = () => {
+
     }
 
     render() {
-        const { message, messageList, status } = this.state;
+        const { message, messageList, usersList } = this.state;
         const { user } = this.props;
 
         return (
             <div className={commonStyles.container}>
                 <div className={chatStyles.chatContainer}>
                     <h2>Чат</h2>
-                    <h3>{status}</h3>
+                    <h3>
+                        Привет
+                        {` ${user.userLogin}`}
+                        !
+                    </h3>
                     <input
                         type='text'
                         onChange={this.handleInputChange}
                         value={message}
                     />
-                    <button type='button'>Отправить</button>
-                    <p>
-                        Привет
-                        {` ${user.userLogin}`}
-                        !
-                    </p>
+                    <button type='button' onClick={this.handleSendMessage}>Отправить</button>
                     <h3>Сообщения</h3>
                     {messageList.map(item => (
-                        <p key={uniqueId()}>{item}</p>
+                        <p key={uniqueId()}>
+                            {item}
+                        </p>
                     ))}
                 </div>
-                <UsersList />
+                <UsersList usersList={usersList} />
             </div>
         );
     }

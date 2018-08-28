@@ -20,3 +20,7 @@ exports.checkUser = (req, res) => {
 exports.logoutUser = userId => {
     userModel.logoutUser(userId);
 };
+
+exports.getOnlineUsers = () => {
+    return userModel.getOnlineUsers();
+}

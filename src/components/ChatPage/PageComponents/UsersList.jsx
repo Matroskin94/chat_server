@@ -9,7 +9,7 @@ const UsersList = ({ usersList }) => {
         <div className={userListStyles.userList}>
             <h3>Пользователи онлайн</h3>
             {usersList.map(user => (
-                <p key={uniqueId()}>{user}</p>
+                <p key={uniqueId()}>{user.userLogin}</p>
             ))}
         </div>
     );
