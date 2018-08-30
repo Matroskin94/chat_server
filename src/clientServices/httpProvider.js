@@ -8,6 +8,7 @@ class HttpProvider {
 
         return axios({
             url,
+            withCredentials: true,
             method,
             headers,
             data: JSON.stringify(data)

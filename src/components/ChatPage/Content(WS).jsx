@@ -11,7 +11,7 @@ class Content extends Component {
 
     constructor() {
         super();
-        this.ws = new WebSocket('ws://localhost:8000');
+        this.ws = new WebSocket('ws://127.0.0.1:8000');
         this.ws.onopen = () => this.setStatus('ONLINE');
 
         this.ws.onclose = () => this.setStatus('Disconnected');

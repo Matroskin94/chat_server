@@ -4,10 +4,21 @@ const bcrypt = require('bcrypt');
 const objectID = require('mongodb').ObjectID;
 const UserSchema = require('../DataShemes/UserSchema');
 const SERVER_MESSAGES = require('../../constants/serverMessages');
+const passport = require('passport');
 
 const saltRounds = 10;
 
-exports.addUser = (creatingUser, cb) => {
+passport.serializeUser(function(user_id, done) {
+  done(null, user_id);
+});
+
+passport.deserializeUser(function(user_id, done) {
+    done(null, user_id);
+});
+
+exports.addUser = (req, cb) => {
+    const creatingUser = req.body;
+
     UserSchema.findOne({ userLogin: creatingUser.userLogin }).then(result => {
         if (!result) {
             return bcrypt.hash(creatingUser.password, saltRounds, function(err, hash) {
@@ -17,9 +28,15 @@ exports.addUser = (creatingUser, cb) => {
                     isOnline: true
                 });
 
-                return user.save()
-                    .then(() => cb('', user))
-                    .catch(error => cb(SERVER_MESSAGES.ERROR_SAVING, ''));
+                req.login(user._id, err => {
+                    if (err) {
+                        return cb(SERVER_MESSAGES.AUTHORIZATION_ERROR, '');
+                    }
+
+                    return user.save()
+                        .then(() => cb('', user))
+                        .catch(error => cb(SERVER_MESSAGES.ERROR_SAVING, ''));
+                });
             });
         }
         return cb(SERVER_MESSAGES.USER_EXISTS, '');
@@ -35,7 +52,13 @@ exports.checkUser = (enteringUser, cb) => {
 
             bcrypt.compare(enteringUser.password, resultUser.password, (err, ress) => {
                 if (ress) {
-                    return cb('', resultUser);
+                    req.login(resultUser._id, err => {
+                        if (err) {
+                            return cb(SERVER_MESSAGES.AUTHORIZATION_ERROR, '');
+                        }
+
+                        return cb('', resultUser);
+                    });
                 }
 
                 return cb(SERVER_MESSAGES.INCORRECT_PASS, '');
@@ -43,12 +66,7 @@ exports.checkUser = (enteringUser, cb) => {
         });
 };
 
-// Поиск по ID
-// const ObjectID = require('mongodb').ObjectID;
-// db.collection('users').findOne({ _id: ObjectID(objID) }, callback(err, ress))
-
 exports.logoutUser = (userId, cb) => {
-    console.log('UserId', userId);
     UserSchema.updateOne({ _id: objectID(userId) }, { isOnline: false }, (err, res) => {
         if (err) {
             console.log('LOGOUT ERROR', err);

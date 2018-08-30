@@ -6,11 +6,12 @@ function sendResult(err, result, reponse) {
     if (err) {
         return reponse.status(500).send({ message: err});
     }
+
     return reponse.status(200).send(result);
 }
 
 exports.createUser = (req, res) => {
-    userModel.addUser(req.body, (err, result) => sendResult(err, result, res));
+    userModel.addUser(req, (err, result) => sendResult(err, result, res));
 };
 
 exports.checkUser = (req, res) => {

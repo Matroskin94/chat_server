@@ -18,7 +18,7 @@ exports.connect = (dbURL, done) => {
 
     mongoose.connection.once('open', () => {
         console.log('Mongoose connected');
-        done();
+        done(mongoose);
     }).on('error', (err) => {
         console.log('Mongoose cjnnection ERROR', err);
     });

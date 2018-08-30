@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 let server;
 
 MongoClient.connect(
-    'mongodb://localhost:27017/mongo_test',
+    'mongodb://127.0.0.1:27017/mongo_test',
     { useNewUrlParser: true, native_parser: true },
     (err, database) => {
         if (err) {
