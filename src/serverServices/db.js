@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const mongoose = require('mongoose');
 
 const state = {
@@ -16,7 +18,7 @@ exports.connect = (dbURL, done) => {
 
     mongoose.connection.once('open', () => {
         console.log('Mongoose connected');
-        done();
+        done(mongoose);
     }).on('error', (err) => {
         console.log('Mongoose cjnnection ERROR', err);
     });

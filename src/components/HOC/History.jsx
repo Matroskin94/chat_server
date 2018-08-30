@@ -7,14 +7,22 @@ export default () => WrappedComponent => {
             router: PropTypes.object.isRequired
         }
 
-        getURLParams = () => this.context.router.route.match.params
+        getURLParams = () => {
+            const { router } = this.context;
+
+            return router.route.match.params;
+        }
 
         historyPush = ({ url, query = '' }) => {
-            this.context.router.history.push(`${url}${query}`);
+            const { router } = this.context;
+
+            router.history.push(`${url}${query}`);
         }
 
         historyBack = () => {
-            this.context.router.history.goBack();
+            const { router } = this.context;
+
+            router.history.goBack();
         }
 
         render() {

@@ -1,7 +1,7 @@
 import { LOGIN_SUCCESS, LOGIN_FAILED } from '../../constants/clientConstants/constants';
 
 const initialState = {
-    isAuthenticated: true,
+    isOnline: false,
     password: '',
     userLogin: 'not authorized',
     failedReason: ''

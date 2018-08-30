@@ -4,9 +4,8 @@ import ProfileService from '../common/ProfileService';
 
 export function loginSuccessAction(userData) {
     const userState = {
-        isAuthenticated: true,
         failedReason: '',
-        ...userData
+        ...userData.data
     };
 
     return ({
@@ -17,7 +16,6 @@ export function loginSuccessAction(userData) {
 
 export function loginFailedAction(reason) {
     const userState = {
-        isAuthenticated: true,
         failedReason: reason
     };
 

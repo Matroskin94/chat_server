@@ -8,18 +8,20 @@ class HttpProvider {
 
         return axios({
             url,
+            withCredentials: true,
             method,
             headers,
             data: JSON.stringify(data)
-        }).then( response => {
+        }).then(response => {
             if (response.status >= 400) {
                 const error = new Error(response.statusText);
+
                 error.response = response;
                 throw error;
             }
 
             return response;
-        }).catch( err => {
+        }).catch(err => {
             throw err.response;
         });
     }
@@ -27,6 +29,6 @@ class HttpProvider {
     static post(url, data = {}) {
         return this.send(url, 'POST', data);
     }
-};
+}
 
 export default HttpProvider;

@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import authorization from '../HOC/Authorization.jsx';
@@ -8,16 +7,15 @@ import { noop } from '../../clientServices/utils/common';
 @authorization()
 class Content extends PureComponent {
     static propTypes = {
-        onRegistrationClick: PropTypes.func, // Функция из LoginHOC для авторизации пользователя
-        isFetching: PropTypes.bool // Переменная ожидания ответа от сервера
+        onRegistrationClick: PropTypes.func // Функция из LoginHOC для авторизации пользователя
     };
+
     static defaultProps = {
-        onRegistrationClick: noop,
-        isFetching: false
+        onRegistrationClick: noop
     };
 
     state = {
-        name: '',
+        userLogin: '',
         password: '',
         registrationError: ''
     }
@@ -25,9 +23,10 @@ class Content extends PureComponent {
     handleInputChange = field => event => this.setState({ [field]: event.target.value })
 
     handleRegistrationClick = () => {
-        const { password, name } = { ...this.state };
+        const { password, userLogin } = { ...this.state };
+        const { onRegistrationClick } = this.props;
 
-        this.props.onRegistrationClick({ password, name }).catch(error => {
+        onRegistrationClick({ password, userLogin }).catch(error => {
             this.setState({ registrationError: error.message });
         });
     }
@@ -40,11 +39,14 @@ class Content extends PureComponent {
             <div>
                 <h1>Регистрация</h1>
                 <p>Логин</p>
-                <input type='text' onChange={this.handleInputChange('name')} />
+                <input type='text' onChange={this.handleInputChange('userLogin')} />
                 <p>Пароль</p>
                 <input type='password' onChange={this.handleInputChange('password')} />
                 <div>
-                    <button onClick={this.handleRegistrationClick}>Зарегистрироваться</button>
+                    <button type='button' onClick={this.handleRegistrationClick}>
+
+                        Зарегистрироваться
+                    </button>
                 </div>
                 <div hidden={!isRegistrationError}>
                     {registrationError}

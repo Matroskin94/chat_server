@@ -32,6 +32,7 @@ export default () => WrappedComponent => {
             checkUser: PropTypes.func,
             enterUser: PropTypes.func
         };
+
         static defaultProps = {
             isFetching: false,
             historyPush: noop,
@@ -40,26 +41,31 @@ export default () => WrappedComponent => {
         };
 
         handleLoginClick = user => {
-            return this.props.checkUser(user).then(response => {
-                // this.props.enterUser(response);
-                // this.props.historyPush({ url: '/chat' });
+            const { checkUser, historyPush } = this.props;
+
+            return checkUser(user).then(response => {
+                historyPush({ url: '/chat' });
             }).catch(err => {
                 throw err.data;
             });
         }
 
         handleRegistrationClick = user => {
-            return this.props.registerUser(user).then(response => {
-                // return response;
+            const { registerUser, historyPush } = this.props;
+
+            return registerUser(user).then(response => {
+                historyPush({ url: '/chat' });
             }).catch(err => {
                 throw err.data;
             });
         }
 
         render() {
+            const { isFetching } = this.props;
+
             return <WrappedComponent
                 {...this.props}
-                isFetching={this.props.isFetching}
+                isFetching={isFetching}
                 onLoginClick={this.handleLoginClick}
                 onRegistrationClick={this.handleRegistrationClick}
             />;
