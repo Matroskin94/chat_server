@@ -24,11 +24,10 @@ exports.addUser = (req, cb) => {
             return bcrypt.hash(creatingUser.password, saltRounds, function(err, hash) {
                 const user = new UserSchema({
                     ...creatingUser,
-                    password: hash,
-                    isOnline: true
+                    password: hash
                 });
 
-                req.login(user._id, err => {
+                req.login({ _id: user._id, userLogin: user.userLogin }, err => {
                     if (err) {
                         return cb(SERVER_MESSAGES.AUTHORIZATION_ERROR, '');
                     }
@@ -43,26 +42,30 @@ exports.addUser = (req, cb) => {
     });
 };
 
-exports.checkUser = (enteringUser, cb) => {
-    UserSchema.findOneAndUpdate({ userLogin: enteringUser.userLogin }, { isOnline: true })
-        .then(resultUser => {
-            if (!resultUser) {
+exports.checkUser = (req, cb) => {
+    const enteringUser = req.body;
+
+    UserSchema.findOne({ userLogin: enteringUser.userLogin })
+        .then(resUser => {
+            if (!resUser) {
                 return cb(SERVER_MESSAGES.NO_USER, '');
             }
 
-            bcrypt.compare(enteringUser.password, resultUser.password, (err, ress) => {
+            return bcrypt.compare(enteringUser.password, resUser.password, (err, ress) => {
                 if (ress) {
-                    req.login(resultUser._id, err => {
+                    return req.login({ _id: resUser._id, userLogin: resUser.userLogin }, err => {
                         if (err) {
                             return cb(SERVER_MESSAGES.AUTHORIZATION_ERROR, '');
                         }
 
-                        return cb('', resultUser);
+                        return cb('', resUser);
                     });
                 }
 
                 return cb(SERVER_MESSAGES.INCORRECT_PASS, '');
             });
+        }).catch( err => {
+            return cb('findOneAndUpdate ERROR', '');
         });
 };
 
@@ -80,5 +83,35 @@ exports.getOnlineUsers = () => {
         if (!err) {
             return res;
         }
+    });
+}
+
+exports.isUserDisconnected = (mongoose, userLogin) => {
+    const searchStr = `"userLogin":"${userLogin}"`;
+
+    return new Promise((resolve, reject) => {
+        mongoose.connection.db.collection('sessions')
+        .findOne({ session: { $regex: searchStr } }, (err, resUser) => {
+            if (resUser) reject('NOT ALL SESSIONS CLOSED');
+            resolve(userLogin);
+        });
+    });
+}
+
+exports.disconnectUser = userLogin => {
+    return UserSchema.findOneAndUpdate({ userLogin: userLogin }, { $set: { isOnline: false }})
+        .catch(err => {
+            console.log('UPDATING USER ERROR (NOT DISCONNECTED)');
+        });
+}
+
+exports.setUserOnline = userLogin => {
+    return new Promise((resolve, reject) => {
+        UserSchema.findOneAndUpdate({ userLogin }, { isOnline: true }, (err, res) => {
+            if (!res.isOnline) {
+                resolve();
+            }
+            reject('USER ALREADY ONLINE');
+        });
     });
 }

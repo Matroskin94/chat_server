@@ -3,20 +3,33 @@ import { uniqueId } from 'lodash';
 import io from 'socket.io-client';
 import PropTypes from 'prop-types';
 
+import history from '../HOC/History.jsx';
 import withUser from '../HOC/WithUser.jsx';
 import UsersList from './PageComponents/UsersList.jsx';
+
+import { noop } from '../../clientServices/utils/common';
+// import ChatService from '../../clientServices/services/ChatService';
+
+
+import SOCKET_API from '../../constants/clientConstants/socketAPI';
 
 import chatStyles from './styles/chatStyles.css';
 import commonStyles from './styles/commonStyles.css';
 
+@history()
 @withUser()
 class Content extends Component {
     static propTypes = {
-        user: PropTypes.object
+        user: PropTypes.object,
+        onCheckAuthentication: PropTypes.func, // withUser HOC
+        historyPush: PropTypes.func
+
     };
 
     static defaultProps = {
-        user: {}
+        user: {},
+        onCheckAuthentication: noop,
+        historyPush: noop
     }
 
     state = {
@@ -27,28 +40,24 @@ class Content extends Component {
     };
 
     componentDidMount() {
-        const sock = io('http://localhost:8000');
-        const { user } = this.props;
+        const { onCheckAuthentication, historyPush } = this.props;
 
-        this.setState({ socket: sock }, () => {
-            const { socket } = this.state;
+        onCheckAuthentication().then(res => {
+            const sock = io('http://localhost:8000');
 
-            socket.on('connect', () => {
-                socket.emit('userConnected', user.userLogin);
-                socket.emit('getOnlineUsers');
+            this.setState({ socket: sock }, () => {
+                const { socket } = this.state;
+
+                socket.emit(SOCKET_API.GET_ONLINE_USERS);
+
+                socket.on(SOCKET_API.ONLINE_USERS, this.showOnlineUsers);
+
+                socket.on(SOCKET_API.CONNECTED_USER, this.showConnectedUser);
+
+                socket.on(SOCKET_API.USER_DISCONNECTED, this.showDisconnectedUser);
             });
-
-            socket.on('onlineUsers', data => {
-                this.setState({ usersList: data });
-            });
-
-            socket.on('connectedUser', connectedUser => {
-                const message = `${connectedUser} присоедиинился к беседе`;
-
-                this.setState(prevState => ({
-                    messageList: prevState.messageList.concat(message)
-                }));
-            });
+        }).catch(err => {
+            historyPush({ url: '/' });
         });
     }
 
@@ -62,6 +71,30 @@ class Content extends Component {
 
     }
 
+    handleLogOut = () => {
+        const { socket } = this.state;
+
+        socket.emit(SOCKET_API.USER_LOGOUT);
+    }
+
+    showConnectedUser = connectedUser => {
+        const message = `${connectedUser} присоедиинился к беседе`;
+
+        this.setState(prevState => ({
+            messageList: prevState.messageList.concat(message)
+        }));
+    }
+
+    showDisconnectedUser = disconnectedUser => {
+        const message = `${disconnectedUser} покинул к беседу`;
+
+        this.setState(prevState => ({
+            messageList: prevState.messageList.concat(message)
+        }));
+    }
+
+    showOnlineUsers = usersList => this.setState({ usersList })
+
     render() {
         const { message, messageList, usersList } = this.state;
         const { user } = this.props;
@@ -70,6 +103,7 @@ class Content extends Component {
             <div className={commonStyles.container}>
                 <div className={chatStyles.chatContainer}>
                     <h2>Чат</h2>
+                    <button type='button' onClick={this.handleLogOut}>Выйти</button>
                     <h3>
                         Привет
                         {` ${user.userLogin}`}

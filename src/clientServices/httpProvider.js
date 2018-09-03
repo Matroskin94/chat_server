@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 class HttpProvider {
-    static send(url, method = 'POST', data) {
+    static send(url, method = 'POST', data = {}) {
         const headers = {
             'Content-Type': 'application/json;charset=UTF-8'
         };
@@ -28,6 +28,10 @@ class HttpProvider {
 
     static post(url, data = {}) {
         return this.send(url, 'POST', data);
+    }
+
+    static get(url) {
+        return this.send(url, 'GET');
     }
 }
 
