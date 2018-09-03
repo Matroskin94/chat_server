@@ -8,6 +8,10 @@ class ProfileService {
     static register(user) {
         return ProfileRepository.register(user);
     }
+
+    static checkAuthentication() {
+        return ProfileRepository.isAuthenticated();
+    }
 }
 
 export default ProfileService;

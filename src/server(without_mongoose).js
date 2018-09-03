@@ -52,33 +52,5 @@ function startServer(database) {
     });
 }
 
-// Поиск по ID
-// const ObjectID = require('mongodb').ObjectID;
-// db.collection('users').findOne({ _id: ObjectID(objID) }, callback(err, ress))
-
-/* function startService(db) {
-    server.on('connection', (ws, req) => {
-        console.log('Client connected');
-        ws.on('message', message => {
-            db.collection('messages').insertOne({ messageText: message }, (err, result) => {
-                if (err) {
-                    console.log('ERROR!!', err);
-                    result.sendStatus(500);
-                    return;
-                }
-            });
-            server.clients.forEach(client => {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(message);
-                }
-            });
-        });
-
-        ws.on('close', (code, reason) => {
-            console.log('Disconnected code', code);
-            console.log('Disconnected reason', reason);
-        });
-    });
-} */
 
 

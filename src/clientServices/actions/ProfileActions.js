@@ -1,6 +1,6 @@
 import { fetchStart, fetchEnd } from './NetworkActions';
 import { LOGIN_SUCCESS, LOGIN_FAILED } from '../../constants/clientConstants/constants';
-import ProfileService from '../common/ProfileService';
+import ProfileService from '../services/ProfileService';
 
 export function loginSuccessAction(userData) {
     const userState = {
@@ -48,6 +48,23 @@ export function registrationRequestAction(user) {
         return ProfileService.register(user).then(response => {
             dispatch(fetchEnd());
             dispatch(loginSuccessAction(response));
+            return response;
+        }).catch(error => {
+            dispatch(fetchEnd());
+
+            throw error;
+        });
+    };
+}
+
+export function checkAuthentication() {
+    return dispatch => {
+        dispatch(fetchStart());
+
+        return ProfileService.checkAuthentication().then(response => {
+            dispatch(fetchEnd());
+            dispatch(loginSuccessAction(response));
+
             return response;
         }).catch(error => {
             dispatch(fetchEnd());

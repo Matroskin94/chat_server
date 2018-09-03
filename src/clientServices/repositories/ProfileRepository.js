@@ -9,6 +9,10 @@ class ProfileRepository {
     static register(user) {
         return httpProvider.post(API.USER, user);
     }
+
+    static isAuthenticated() {
+        return httpProvider.post(API.CHECK_AUTHENTICATION);
+    }
 }
 
 export default ProfileRepository;

@@ -15,7 +15,7 @@ exports.createUser = (req, res) => {
 };
 
 exports.checkUser = (req, res) => {
-    userModel.checkUser(req.body, (err, result) => sendResult(err, result, res));
+    userModel.checkUser(req, (err, result) => sendResult(err, result, res));
 };
 
 exports.logoutUser = userId => {
@@ -24,4 +24,16 @@ exports.logoutUser = userId => {
 
 exports.getOnlineUsers = () => {
     return userModel.getOnlineUsers();
+}
+
+exports.isUserDisconnected = (mongoose, userLogin) => {
+    return userModel.isUserDisconnected(mongoose, userLogin);
+}
+
+exports.setUserOnline = userLogin => {
+    return userModel.setUserOnline(userLogin);
+}
+
+exports.disconnectUser = userLogin => {
+    return userModel.disconnectUser(userLogin);
 }

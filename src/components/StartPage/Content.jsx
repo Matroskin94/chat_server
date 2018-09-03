@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 import authorization from '../HOC/Authorization.jsx';
+
 import { noop } from '../../clientServices/utils/common';
 
 @authorization()
