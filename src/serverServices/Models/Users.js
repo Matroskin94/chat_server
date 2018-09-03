@@ -26,8 +26,13 @@ exports.addUser = (req, cb) => {
                     ...creatingUser,
                     password: hash
                 });
+                const userCreeds = {
+                    _id: user._id,
+                    userLogin: user.userLogin,
+                    password: user.password,
+                };
 
-                req.login({ _id: user._id, userLogin: user.userLogin }, err => {
+                req.login(userCreeds, err => {
                     if (err) {
                         return cb(SERVER_MESSAGES.AUTHORIZATION_ERROR, '');
                     }
@@ -53,7 +58,13 @@ exports.checkUser = (req, cb) => {
 
             return bcrypt.compare(enteringUser.password, resUser.password, (err, ress) => {
                 if (ress) {
-                    return req.login({ _id: resUser._id, userLogin: resUser.userLogin }, err => {
+                    const userCreeds = {
+                        _id: resUser._id,
+                        userLogin: resUser.userLogin,
+                        password: resUser.password,
+                    };
+
+                    return req.login(userCreeds, err => {
                         if (err) {
                             return cb(SERVER_MESSAGES.AUTHORIZATION_ERROR, '');
                         }
@@ -99,10 +110,14 @@ exports.isUserDisconnected = (mongoose, userLogin) => {
 }
 
 exports.disconnectUser = userLogin => {
-    return UserSchema.findOneAndUpdate({ userLogin: userLogin }, { $set: { isOnline: false }})
+    return new Promise((resolve, reject) => {
+        UserSchema.findOneAndUpdate({ userLogin: userLogin }, { $set: { isOnline: false }})
+        .then(resolve)
         .catch(err => {
             console.log('UPDATING USER ERROR (NOT DISCONNECTED)');
+            reject('UPDATING USER ERROR (NOT DISCONNECTED)');
         });
+    });
 }
 
 exports.setUserOnline = userLogin => {

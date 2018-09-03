@@ -1,26 +1,14 @@
 import { fetchStart, fetchEnd } from './NetworkActions';
-import { LOGIN_SUCCESS, LOGIN_FAILED } from '../../constants/clientConstants/constants';
+import { LOGIN_SUCCESS } from '../../constants/clientConstants/constants';
 import ProfileService from '../services/ProfileService';
 
 export function loginSuccessAction(userData) {
     const userState = {
-        failedReason: '',
         ...userData.data
     };
 
     return ({
         type: LOGIN_SUCCESS,
-        payload: userState
-    });
-}
-
-export function loginFailedAction(reason) {
-    const userState = {
-        failedReason: reason
-    };
-
-    return ({
-        type: LOGIN_FAILED,
         payload: userState
     });
 }

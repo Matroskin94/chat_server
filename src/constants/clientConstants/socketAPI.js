@@ -5,7 +5,9 @@ const SOCKET_API = {
     ONLINE_USERS: 'onlineUsers',
     CONNECTED_USER: 'connectedUser',
     USER_LOGOUT: 'userLogout',
-    USER_DISCONNECTED: 'userDisconnected'
+    USER_DISCONNECTED: 'userDisconnected',
+    SEND_MESSAGE: 'sendMessage',
+    RECIEVE_MESSAGE: 'recieveMessage'
 };
 
 export default SOCKET_API;

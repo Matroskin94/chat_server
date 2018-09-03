@@ -55,6 +55,8 @@ class Content extends Component {
                 socket.on(SOCKET_API.CONNECTED_USER, this.showConnectedUser);
 
                 socket.on(SOCKET_API.USER_DISCONNECTED, this.showDisconnectedUser);
+
+                socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
             });
         }).catch(err => {
             historyPush({ url: '/' });
@@ -68,32 +70,60 @@ class Content extends Component {
     }
 
     handleSendMessage = () => {
+        const { socket, message } = this.state;
+        const { user } = this.props;
 
+        const messageObj = {
+            isServiseMessage: false,
+            author: {
+                _id: user._id,
+                userLogin: user.userLogin
+            },
+            text: message
+        };
+
+        socket.emit(SOCKET_API.SEND_MESSAGE, messageObj);
+        this.setState(prevState => ({
+            messageList: prevState.messageList.concat(messageObj)
+        }));
     }
 
     handleLogOut = () => {
         const { socket } = this.state;
+        const { historyPush } = this.props;
 
         socket.emit(SOCKET_API.USER_LOGOUT);
+        historyPush({ url: '/' });
     }
 
     showConnectedUser = connectedUser => {
-        const message = `${connectedUser} присоедиинился к беседе`;
+        const message = {
+            isServiseMessage: true,
+            author: { userLogin: connectedUser },
+            text: `${connectedUser} присоедиинился к беседе`
+        };
 
-        this.setState(prevState => ({
-            messageList: prevState.messageList.concat(message)
-        }));
+        this.addMessageToState(message);
     }
 
     showDisconnectedUser = disconnectedUser => {
-        const message = `${disconnectedUser} покинул к беседу`;
+        const message = {
+            isServiseMessage: true,
+            author: { userLogin: disconnectedUser },
+            text: `${disconnectedUser} покинул к беседу`
+        };
 
-        this.setState(prevState => ({
-            messageList: prevState.messageList.concat(message)
-        }));
+        this.addMessageToState(message);
     }
 
-    showOnlineUsers = usersList => this.setState({ usersList })
+    showOnlineUsers = usersList => {
+        console.log('SHOW USERS', usersList);
+        this.setState({ usersList });
+    }
+
+    addMessageToState = mess => this.setState(prevState => ({
+        messageList: prevState.messageList.concat(mess)
+    }))
 
     render() {
         const { message, messageList, usersList } = this.state;
@@ -116,10 +146,15 @@ class Content extends Component {
                     />
                     <button type='button' onClick={this.handleSendMessage}>Отправить</button>
                     <h3>Сообщения</h3>
-                    {messageList.map(item => (
-                        <p key={uniqueId()}>
-                            {item}
-                        </p>
+                    {messageList.map(mess => (
+                        <div key={uniqueId()}>
+                            <h5>
+                                {mess.author.userLogin}
+                            </h5>
+                            <p>
+                                {mess.text}
+                            </p>
+                        </div>
                     ))}
                 </div>
                 <UsersList usersList={usersList} />
