@@ -26,15 +26,14 @@ function startServer(mongoose) {
     });
 
     io.on('connection', socket => {
-        userController.getOnlineUsers().then(result => {
-            socket.broadcast.emit('onlineUsers', result);
-        });
-
         if (socket.request.session.passport) {
             const userLogin = socket.request.session.passport.user.userLogin;
 
             userController.setUserOnline(userLogin).then((res) => {
                 socket.broadcast.emit('connectedUser', userLogin);
+                userController.getOnlineUsers().then(result => {
+                    socket.broadcast.emit('onlineUsers', result);
+                });
             }).catch(err => {
                 console.log(err);
             });
@@ -50,20 +49,27 @@ function startServer(mongoose) {
             socket.broadcast.emit('connectedUser', userName);
         });
 
+        socket.on('sendMessage', message => {
+            socket.broadcast.emit('recieveMessage', message);
+        });
+
         socket.on('userLogout', () => {
             const userLogin = socket.request.session.passport.user.userLogin;
 
             socket.request.logout();
             socket.request.session.destroy(() => {
-                userController.isUserDisconnected(mongoose, userLogin).then( () => {
+                return userController.isUserDisconnected(mongoose, userLogin).then( () => {
                     socket.broadcast.emit('userDisconnected', userLogin);
-                    userController.disconnectUser(userLogin);
                 }).catch(err => {
                     console.log(err);
                 });
             });
-
-            socket.disconnect(true);
+            userController.disconnectUser(userLogin).then(() => {
+                userController.getOnlineUsers().then(result => {
+                    socket.broadcast.emit('onlineUsers', result);
+                    socket.disconnect(true);
+                });
+            });
         });
     });
 }

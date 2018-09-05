@@ -8,6 +8,8 @@ import StartPage from './StartPage.jsx';
 import ChatPage from './ChatPage.jsx';
 import RegistrationPage from './RegistrationPage.jsx';
 
+import './index.css';
+
 const store = initStore();
 
 const AppRouter = props => (

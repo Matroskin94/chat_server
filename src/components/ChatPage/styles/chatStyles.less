@@ -1,0 +1,51 @@
+@import "~antd/lib/card/style/index.less";
+
+:global {
+    .ant-card-wider-padding > .ant-card-body{
+        padding: 16px;
+    }
+};
+
+:local {
+    .chatContainer {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 89px);
+        overflow: hidden;
+    }
+
+    .chatHeader {
+        height: 45px;
+    }
+
+    .messagesContainer{
+        flex: 1 0 auto;
+        height: 73vh;
+        padding: 5px 0;
+        overflow-x: hidden;
+    }
+
+    .inputContainer {
+        height: 40px;
+    }
+
+    .cardStyle {
+        margin-bottom: 5px;
+    }
+
+    .cardStyle.ant-card-wider-padding > .cardStyle > div {
+        padding: 16px;
+    }
+
+    .cardStyle > div {
+        padding: 16px;
+    }
+
+    .notification span {
+        font-weight: 900;
+    }
+
+    .notification {
+        margin-bottom: 0;
+    }
+}

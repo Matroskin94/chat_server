@@ -1,10 +1,9 @@
 import { LOGIN_SUCCESS, LOGIN_FAILED } from '../../constants/clientConstants/constants';
 
 const initialState = {
-    isOnline: false,
+    _id: 0,
     password: '',
-    userLogin: 'not authorized',
-    failedReason: ''
+    userLogin: 'not authorized'
 };
 
 export default function ProfileReducer(state = initialState, action) {

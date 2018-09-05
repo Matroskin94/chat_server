@@ -11,7 +11,6 @@ import {
 function mapStateToProps(state) {
     return {
         user: {
-            isOnline: state.profileReducer.isOnline,
             userLogin: state.profileReducer.userLogin,
             password: state.profileReducer.password
         }
