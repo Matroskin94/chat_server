@@ -1,19 +1,32 @@
 import React, { Component } from 'react';
-import { uniqueId } from 'lodash';
 import io from 'socket.io-client';
 import PropTypes from 'prop-types';
+
+import Button from 'antd/lib/button';
+import {
+    Header as AntHeader,
+    Sider,
+    Content as AntContent
+} from 'antd/lib/layout';
+import { Layout, Input } from 'antd';
+import 'antd/lib/menu/style';
+import 'antd/lib/layout/style';
+import 'antd/lib/button/style';
+import 'antd/lib/input/style';
 
 import history from '../HOC/History.jsx';
 import withUser from '../HOC/WithUser.jsx';
 import UsersList from './PageComponents/UsersList.jsx';
+import MessagesList from './PageComponents/MessagesList.jsx';
 
 import { noop } from '../../clientServices/utils/common';
 // import ChatService from '../../clientServices/services/ChatService';
 
 
 import SOCKET_API from '../../constants/clientConstants/socketAPI';
+import API from '../../constants/clientConstants/api';
 
-import chatStyles from './styles/chatStyles.css';
+import chatStyles from './styles/chatStyles.less';
 import commonStyles from './styles/commonStyles.css';
 
 @history()
@@ -43,7 +56,7 @@ class Content extends Component {
         const { onCheckAuthentication, historyPush } = this.props;
 
         onCheckAuthentication().then(res => {
-            const sock = io('http://localhost:8000');
+            const sock = io(API.BASE_URL);
 
             this.setState({ socket: sock }, () => {
                 const { socket } = this.state;
@@ -93,14 +106,17 @@ class Content extends Component {
         const { historyPush } = this.props;
 
         socket.emit(SOCKET_API.USER_LOGOUT);
-        historyPush({ url: '/' });
+
+        this.setState({ socket: null }, () => {
+            historyPush({ url: '/' });
+        });
     }
 
     showConnectedUser = connectedUser => {
         const message = {
             isServiseMessage: true,
             author: { userLogin: connectedUser },
-            text: `${connectedUser} присоедиинился к беседе`
+            text: ' присоедиинился к беседе'
         };
 
         this.addMessageToState(message);
@@ -110,14 +126,13 @@ class Content extends Component {
         const message = {
             isServiseMessage: true,
             author: { userLogin: disconnectedUser },
-            text: `${disconnectedUser} покинул к беседу`
+            text: ' покинул к беседу'
         };
 
         this.addMessageToState(message);
     }
 
     showOnlineUsers = usersList => {
-        console.log('SHOW USERS', usersList);
         this.setState({ usersList });
     }
 
@@ -130,35 +145,40 @@ class Content extends Component {
         const { user } = this.props;
 
         return (
-            <div className={commonStyles.container}>
-                <div className={chatStyles.chatContainer}>
-                    <h2>Чат</h2>
-                    <button type='button' onClick={this.handleLogOut}>Выйти</button>
+            <Layout>
+                <AntHeader className={commonStyles.header}>
                     <h3>
                         Привет
                         {` ${user.userLogin}`}
                         !
                     </h3>
-                    <input
-                        type='text'
-                        onChange={this.handleInputChange}
-                        value={message}
-                    />
-                    <button type='button' onClick={this.handleSendMessage}>Отправить</button>
-                    <h3>Сообщения</h3>
-                    {messageList.map(mess => (
-                        <div key={uniqueId()}>
-                            <h5>
-                                {mess.author.userLogin}
-                            </h5>
-                            <p>
-                                {mess.text}
-                            </p>
+                    <Button onClick={this.handleLogOut}>Выйти</Button>
+                </AntHeader>
+                <Layout className={commonStyles.contentContainer}>
+                    <AntContent className={chatStyles.chatContainer}>
+                        <div className={chatStyles.chatHeader}>
+                            <h3>
+                                Чат Node.js
+                            </h3>
+                            <hr />
                         </div>
-                    ))}
-                </div>
-                <UsersList usersList={usersList} />
-            </div>
+                        <MessagesList messagesList={messageList} styles={chatStyles} />
+                        <Input.Search
+                            className={chatStyles.inputContainer}
+                            placeholder='Сообщение...'
+                            enterButton='Отправить'
+                            size='large'
+                            onSearch={this.handleSendMessage}
+                            type='text'
+                            onChange={this.handleInputChange}
+                            value={message}
+                        />
+                    </AntContent>
+                    <Sider className={commonStyles.sider}>
+                        <UsersList usersList={usersList} />
+                    </Sider>
+                </Layout>
+            </Layout>
         );
     }
 }

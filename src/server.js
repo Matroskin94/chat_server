@@ -60,13 +60,16 @@ function startServer(mongoose) {
             socket.request.session.destroy(() => {
                 return userController.isUserDisconnected(mongoose, userLogin).then( () => {
                     socket.broadcast.emit('userDisconnected', userLogin);
-                    userController.disconnectUser(userLogin);
                 }).catch(err => {
                     console.log(err);
                 });
             });
-
-            socket.disconnect(true);
+            userController.disconnectUser(userLogin).then(() => {
+                userController.getOnlineUsers().then(result => {
+                    socket.broadcast.emit('onlineUsers', result);
+                    socket.disconnect(true);
+                });
+            });
         });
     });
 }

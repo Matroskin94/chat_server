@@ -1,5 +1,6 @@
 const SOCKET_API = {
     CONNECT: 'connect',
+    DISCONNECT: 'disconnect',
     USER_CONNECTED: 'userConnected',
     GET_ONLINE_USERS: 'getOnlineUsers',
     ONLINE_USERS: 'onlineUsers',

@@ -114,7 +114,6 @@ exports.disconnectUser = userLogin => {
         UserSchema.findOneAndUpdate({ userLogin: userLogin }, { $set: { isOnline: false }})
         .then(resolve)
         .catch(err => {
-            console.log('UPDATING USER ERROR (NOT DISCONNECTED)');
             reject('UPDATING USER ERROR (NOT DISCONNECTED)');
         });
     });
