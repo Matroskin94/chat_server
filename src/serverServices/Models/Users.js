@@ -16,11 +16,26 @@ passport.deserializeUser(function(user_id, done) {
     done(null, user_id);
 });
 
+exports.isAuthenticated = (req, cb) => {
+    if (req.isAuthenticated()) {
+        return cb('', req.session.passport.user);
+    }
+    return cb({ message: SERVER_MESSAGES.NOT_AUTHENTICATED, code: 401}, '');
+}
+
 exports.addUser = (req, cb) => {
     const creatingUser = req.body;
 
     UserSchema.findOne({ userLogin: creatingUser.userLogin }).then(result => {
         if (!result) {
+            if (creatingUser.password === '') {
+                return cb({
+                    message: SERVER_MESSAGES.PASSWORD_REQUIRED,
+                    field: 'password',
+                    code: 500
+                }, '');
+            }
+
             return bcrypt.hash(creatingUser.password, saltRounds, function(err, hash) {
                 const user = new UserSchema({
                     ...creatingUser,
@@ -34,16 +49,16 @@ exports.addUser = (req, cb) => {
 
                 req.login(userCreeds, err => {
                     if (err) {
-                        return cb(SERVER_MESSAGES.AUTHORIZATION_ERROR, '');
+                        return cb({ message: SERVER_MESSAGES.AUTHORIZATION_ERROR, code: 500 }, '');
                     }
 
                     return user.save()
                         .then(() => cb('', user))
-                        .catch(error => cb(SERVER_MESSAGES.ERROR_SAVING, ''));
+                        .catch(error => cb({ message: SERVER_MESSAGES.ERROR_SAVING, code: 500 }, ''));
                 });
             });
         }
-        return cb(SERVER_MESSAGES.USER_EXISTS, '');
+        return cb({ message: SERVER_MESSAGES.USER_EXISTS, field: 'userLogin', code: 500 }, '');
     });
 };
 
@@ -53,7 +68,7 @@ exports.checkUser = (req, cb) => {
     UserSchema.findOne({ userLogin: enteringUser.userLogin })
         .then(resUser => {
             if (!resUser) {
-                return cb(SERVER_MESSAGES.NO_USER, '');
+                return cb({message: SERVER_MESSAGES.NO_USER, field: 'userLogin', code: 500}, '');
             }
 
             return bcrypt.compare(enteringUser.password, resUser.password, (err, ress) => {
@@ -66,17 +81,17 @@ exports.checkUser = (req, cb) => {
 
                     return req.login(userCreeds, err => {
                         if (err) {
-                            return cb(SERVER_MESSAGES.AUTHORIZATION_ERROR, '');
+                            return cb({ message: SERVER_MESSAGES.AUTHORIZATION_ERROR, code: 500 }, '');
                         }
 
                         return cb('', resUser);
                     });
                 }
 
-                return cb(SERVER_MESSAGES.INCORRECT_PASS, '');
+                return cb({ message: SERVER_MESSAGES.INCORRECT_PASS, field: 'password', code: 500 }, '');
             });
         }).catch( err => {
-            return cb('findOneAndUpdate ERROR', '');
+            return cb({ message: 'findOneAndUpdate ERROR', code: 500 }, '');
         });
 };
 
