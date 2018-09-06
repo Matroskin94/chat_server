@@ -18,12 +18,8 @@ function startServer(mongoose) {
     // POST: /checkUser - проверка наличия полльзователя и совпадения пароля
     app.post('/checkUser', userController.checkUser);
 
-    app.post('/isAuthenticated', (req, res) => {
-        if (req.isAuthenticated()) {
-            return res.status(200).send(req.session.passport.user);
-        }
-        return res.status(401).send('NOT AUTHENTICATED');
-    });
+    // POST: /isAuthenticated - проверка авторизирован ли пользователь
+    app.post('/isAuthenticated', userController.isAuthenticated);
 
     io.on('connection', socket => {
         if (socket.request.session.passport) {

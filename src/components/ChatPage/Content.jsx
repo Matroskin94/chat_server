@@ -20,8 +20,6 @@ import UsersList from './PageComponents/UsersList.jsx';
 import MessagesList from './PageComponents/MessagesList.jsx';
 
 import { noop } from '../../clientServices/utils/common';
-// import ChatService from '../../clientServices/services/ChatService';
-
 
 import SOCKET_API from '../../constants/clientConstants/socketAPI';
 import API from '../../constants/clientConstants/api';

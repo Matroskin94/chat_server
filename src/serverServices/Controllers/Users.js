@@ -4,10 +4,14 @@ const userModel = require('../Models/Users');
 
 function sendResult(err, result, reponse) {
     if (err) {
-        return reponse.status(500).send({ message: err});
+        return reponse.status(err.code).send(err);
     }
 
     return reponse.status(200).send(result);
+}
+
+exports.isAuthenticated = (req, res) => {
+    userModel.isAuthenticated(req, (err, result) => sendResult(err, result, res))
 }
 
 exports.createUser = (req, res) => {

@@ -1,8 +1,20 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
+import {
+    Form,
+    Icon,
+    Input,
+    Button,
+    Card
+} from 'antd';
+
 import authorization from '../HOC/Authorization.jsx';
 import { noop } from '../../clientServices/utils/common';
+
+import styles from './styles.less';
+
+const FormItem = Form.Item;
 
 @authorization()
 class Content extends PureComponent {
@@ -17,7 +29,14 @@ class Content extends PureComponent {
     state = {
         userLogin: '',
         password: '',
-        registrationError: ''
+        registrationError: {
+            userLogin: '',
+            password: ''
+        },
+        errorFields: {
+            userLogin: '',
+            password: ''
+        }
     }
 
     handleInputChange = field => event => this.setState({ [field]: event.target.value })
@@ -26,31 +45,59 @@ class Content extends PureComponent {
         const { password, userLogin } = { ...this.state };
         const { onRegistrationClick } = this.props;
 
-        onRegistrationClick({ password, userLogin }).catch(error => {
-            this.setState({ registrationError: error.message });
+        onRegistrationClick({ password, userLogin }).then(() => {
+            this.setState({
+                registrationError: { userLogin: '', password: '' },
+                errorFields: { userLogin: '', password: '' }
+            });
+        }).catch(error => {
+            this.setState({
+                registrationError: { [error.field]: error.message },
+                errorFields: { [error.field]: 'error' }
+            });
         });
     }
 
     render() {
-        const { registrationError } = this.state;
-        const isRegistrationError = !!registrationError;
+        const { registrationError, errorFields } = this.state;
 
         return (
-            <div>
-                <h1>Регистрация</h1>
-                <p>Логин</p>
-                <input type='text' onChange={this.handleInputChange('userLogin')} />
-                <p>Пароль</p>
-                <input type='password' onChange={this.handleInputChange('password')} />
-                <div>
-                    <button type='button' onClick={this.handleRegistrationClick}>
+            <div className={styles.pageContainer}>
+                <Card title='Регистрация' className={styles.formContainer}>
+                    <Form>
+                        <FormItem
+                            validateStatus={errorFields.userLogin}
+                            help={errorFields.userLogin ? registrationError.userLogin : ''}
+                        >
+                            <Input
+                                prefix={<Icon type='user' className={styles.icon} />}
+                                placeholder='Логин'
+                                onChange={this.handleInputChange('userLogin')}
+                            />
+                        </FormItem>
+                        <FormItem
+                            validateStatus={errorFields.password}
+                            help={errorFields.password ? registrationError.password : ''}
+                        >
+                            <Input
+                                prefix={<Icon type='lock' className={styles.icon} />}
+                                type='password'
+                                placeholder='Пароль'
+                                onChange={this.handleInputChange('password')}
+                            />
 
-                        Зарегистрироваться
-                    </button>
-                </div>
-                <div hidden={!isRegistrationError}>
-                    {registrationError}
-                </div>
+                        </FormItem>
+                        <FormItem>
+                            <Button
+                                type='primary'
+                                onClick={this.handleRegistrationClick}
+                                className={styles.loginButton}
+                            >
+                                Зарегистрироваться
+                            </Button>
+                        </FormItem>
+                    </Form>
+                </Card>
             </div>
         );
     }
