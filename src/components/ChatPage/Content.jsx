@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import PropTypes from 'prop-types';
+// import Sound from 'react-sound';
 
 import Button from 'antd/lib/button';
 import {
@@ -23,6 +24,9 @@ import { noop } from '../../clientServices/utils/common';
 
 import SOCKET_API from '../../constants/clientConstants/socketAPI';
 import API from '../../constants/clientConstants/api';
+
+import messSound from '../../assets/Message_sound.mp3';
+import servSound from '../../assets/ServiceMessage_sound.mp3';
 
 import chatStyles from './styles/chatStyles.less';
 import commonStyles from './styles/commonStyles.css';
@@ -47,7 +51,9 @@ class Content extends Component {
         usersList: [],
         message: '',
         socket: null,
-        messageList: []
+        messageList: [],
+        messageSound: new Audio(messSound),
+        serviceSound: new Audio(servSound)
     };
 
     componentDidMount() {
@@ -134,9 +140,19 @@ class Content extends Component {
         this.setState({ usersList });
     }
 
-    addMessageToState = mess => this.setState(prevState => ({
-        messageList: prevState.messageList.concat(mess)
-    }))
+    addMessageToState = mess => {
+        const { messageSound, serviceSound } = this.state;
+
+        this.setState(prevState => ({
+            messageList: prevState.messageList.concat(mess)
+        }), () => {
+            if (mess.isServiseMessage) {
+                serviceSound.play();
+            } else {
+                messageSound.play();
+            }
+        });
+    }
 
     render() {
         const { message, messageList, usersList } = this.state;

@@ -68,6 +68,15 @@ module.exports = {
                         } // compiles Less to CSS
                     }
                 ]
+            },
+            {
+                test: /\.mp3$/,
+                include: path.join(__dirname, 'src', 'assets'),
+                use: [
+                    {
+                        loader: 'file-loader'
+                    }
+                ]
             }
         ]
     },

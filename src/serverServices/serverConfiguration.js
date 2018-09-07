@@ -46,6 +46,8 @@ function configureServer(mongoose) {
 
     server.listen(8000);
 
+    console.log('SERVER STARTED');
+
     return { app, io };
 }
 
