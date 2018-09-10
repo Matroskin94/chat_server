@@ -1,19 +1,29 @@
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const PRODUCTION_MODE = process.env.NODE_ENV.trim() === 'production';
 
 module.exports = {
     entry: path.join(__dirname, 'src', 'App.jsx'),
     output: {
         path: path.resolve(__dirname, 'public'),
-        filename: 'bundle.js',
-        publicPath: '/'
+        filename: 'bundle.js'
     },
     plugins: [
         new ExtractTextPlugin({
-              filename: 'style-[contenthash].css',
-              disable: false,
-              allChunks: false, // true
-            })
+            filename: 'style-[contenthash].css',
+            disable: false,
+            allChunks: false, // true
+        }),
+        new MiniCssExtractPlugin({
+            filename: './style.[contenthash].css',
+        }),
+        new HtmlWebPackPlugin({
+            template: "./src/index.html",
+            filename: "./index.html"
+        })
     ],
     module: {
         rules: [
@@ -28,6 +38,7 @@ module.exports = {
                 {
                     loader: "style-loader"
                 },
+                // MiniCssExtractPlugin.loader,
                 {
                     loader: "css-loader",
                     options: {
@@ -42,16 +53,28 @@ module.exports = {
                 use: [
                     {
                         loader: "style-loader" // creates style nodes from JS strings
-                    }, {
+                    },
+                    // MiniCssExtractPlugin.loader,
+                    {
                         loader: "css-loader",
                         options: {
                             localIdentName: '[local]___[hash:base64:5]'
                         }// translates CSS into CommonJS
-                    }, {
+                    },
+                    {
                         loader: "less-loader",
                         options: {
                             javascriptEnabled: true
                         } // compiles Less to CSS
+                    }
+                ]
+            },
+            {
+                test: /\.mp3$/,
+                include: path.join(__dirname, 'src', 'assets'),
+                use: [
+                    {
+                        loader: 'file-loader'
                     }
                 ]
             }
@@ -60,6 +83,5 @@ module.exports = {
     devServer: {
         historyApiFallback: true,
         contentBase: path.join(__dirname, 'public')
-    },
-    mode: 'development'
+    }
 };

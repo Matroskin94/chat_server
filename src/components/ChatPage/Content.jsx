@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import PropTypes from 'prop-types';
+import withSizes from 'react-sizes';
 
 import Button from 'antd/lib/button';
 import {
     Header as AntHeader,
-    Sider,
     Content as AntContent
 } from 'antd/lib/layout';
 import { Layout, Input } from 'antd';
@@ -24,30 +24,39 @@ import { noop } from '../../clientServices/utils/common';
 import SOCKET_API from '../../constants/clientConstants/socketAPI';
 import API from '../../constants/clientConstants/api';
 
+import messSound from '../../assets/Message_sound.mp3';
+import servSound from '../../assets/ServiceMessage_sound.mp3';
+
 import chatStyles from './styles/chatStyles.less';
-import commonStyles from './styles/commonStyles.css';
+import commonStyles from './styles/commonStyles.less';
 
 @history()
 @withUser()
+@withSizes(({ width }) => ({ isMobile: width < 580 }))
 class Content extends Component {
     static propTypes = {
         user: PropTypes.object,
         onCheckAuthentication: PropTypes.func, // withUser HOC
-        historyPush: PropTypes.func
+        historyPush: PropTypes.func,
+        isMobile: PropTypes.bool // withSizes HOC
 
     };
 
     static defaultProps = {
         user: {},
         onCheckAuthentication: noop,
-        historyPush: noop
+        historyPush: noop,
+        isMobile: false
     }
 
     state = {
         usersList: [],
         message: '',
         socket: null,
-        messageList: []
+        messageList: [],
+        isCollapsed: false,
+        messageSound: new Audio(messSound),
+        serviceSound: new Audio(servSound)
     };
 
     componentDidMount() {
@@ -55,8 +64,9 @@ class Content extends Component {
 
         onCheckAuthentication().then(res => {
             const sock = io(API.BASE_URL);
+            const { isMobile } = this.props;
 
-            this.setState({ socket: sock }, () => {
+            this.setState({ socket: sock, isCollapsed: isMobile }, () => {
                 const { socket } = this.state;
 
                 socket.emit(SOCKET_API.GET_ONLINE_USERS);
@@ -69,9 +79,19 @@ class Content extends Component {
 
                 socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
             });
+
+            window.addEventListener('resize', this.updateScreenSize);
         }).catch(err => {
             historyPush({ url: '/' });
         });
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.updateScreenSize);
+    }
+
+    onCollapse = collapsed => {
+        this.setState({ isCollapsed: collapsed });
     }
 
     handleInputChange = e => {
@@ -95,7 +115,8 @@ class Content extends Component {
 
         socket.emit(SOCKET_API.SEND_MESSAGE, messageObj);
         this.setState(prevState => ({
-            messageList: prevState.messageList.concat(messageObj)
+            messageList: prevState.messageList.concat(messageObj),
+            message: ''
         }));
     }
 
@@ -108,6 +129,15 @@ class Content extends Component {
         this.setState({ socket: null }, () => {
             historyPush({ url: '/' });
         });
+    }
+
+    updateScreenSize = () => {
+        const { isMobile } = this.props;
+        const { isCollapsed } = this.state;
+
+        if (isMobile !== isCollapsed) {
+            this.setState({ isCollapsed: isMobile});
+        }
     }
 
     showConnectedUser = connectedUser => {
@@ -134,12 +164,27 @@ class Content extends Component {
         this.setState({ usersList });
     }
 
-    addMessageToState = mess => this.setState(prevState => ({
-        messageList: prevState.messageList.concat(mess)
-    }))
+    addMessageToState = mess => {
+        const { messageSound, serviceSound } = this.state;
+
+        this.setState(prevState => ({
+            messageList: prevState.messageList.concat(mess)
+        }), () => {
+            if (mess.isServiseMessage) {
+                serviceSound.play();
+            } else {
+                messageSound.play();
+            }
+        });
+    }
 
     render() {
-        const { message, messageList, usersList } = this.state;
+        const {
+            message,
+            messageList,
+            usersList,
+            isCollapsed
+        } = this.state;
         const { user } = this.props;
 
         return (
@@ -161,20 +206,22 @@ class Content extends Component {
                             <hr />
                         </div>
                         <MessagesList messagesList={messageList} styles={chatStyles} />
-                        <Input.Search
-                            className={chatStyles.inputContainer}
-                            placeholder='Сообщение...'
-                            enterButton='Отправить'
-                            size='large'
-                            onSearch={this.handleSendMessage}
-                            type='text'
-                            onChange={this.handleInputChange}
-                            value={message}
-                        />
+                        <div className={chatStyles.inputContainer}>
+                            <Input placeholder='Сообщение...' onChange={this.handleInputChange} />
+                            <Button
+                                type='primary'
+                                shape='circle'
+                                icon='notification'
+                                onClick={this.handleSendMessage}
+                                size={32}
+                            />
+                        </div>
                     </AntContent>
-                    <Sider className={commonStyles.sider}>
-                        <UsersList usersList={usersList} />
-                    </Sider>
+                    <UsersList
+                        isCollapsed={isCollapsed}
+                        usersList={usersList}
+                        handleCollapse={this.onCollapse}
+                    />
                 </Layout>
             </Layout>
         );

@@ -1,15 +1,48 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { uniqueId } from 'lodash';
+import classnames from 'classnames';
 
 import { Menu, Icon } from 'antd';
+import { Sider } from 'antd/lib/layout';
 import 'antd/lib/menu/style';
 
-const UsersList = ({ usersList }) => {
+import { noop } from '../../../clientServices/utils/common';
+
+import userListStyles from '../styles/userListStyles.less';
+import commonStyles from '../styles/commonStyles.less';
+
+const UsersList = ({ usersList, isCollapsed, handleCollapse }) => {
     return (
-        <Fragment>
-            <div className='logo'>
-                <h3>Пользователи онлайн</h3>
+        <Sider
+            className={commonStyles.sider}
+            collapsible
+            collapsed={isCollapsed}
+            onCollapse={handleCollapse}
+            reverseArrow
+        >
+            <div className={
+                classnames(
+                    'logo',
+                    userListStyles.header,
+                    { [userListStyles.headerHidden]: isCollapsed }
+                )}
+            >
+                {!isCollapsed ?
+                    <h3>
+                        Онлайн:&nbsp;
+                        <b>
+                            {usersList.length}
+                        </b>
+                    </h3> :
+                    <Fragment>
+                        <Icon type='team' />
+                        &nbsp;
+                        <b>
+                            {usersList.length}
+                        </b>
+                    </Fragment>
+                }
             </div>
             <Menu
                 theme='dark'
@@ -24,16 +57,20 @@ const UsersList = ({ usersList }) => {
                     </Menu.Item>
                 ))}
             </Menu>
-        </Fragment>
+        </Sider>
     );
 };
 
 UsersList.propTypes = {
-    usersList: PropTypes.array
+    usersList: PropTypes.array,
+    handleCollapse: PropTypes.func,
+    isCollapsed: PropTypes.bool
 };
 
 UsersList.defaultProps = {
-    usersList: []
+    usersList: [],
+    handleCollapse: noop,
+    isCollapsed: false
 };
 
 export default UsersList;
