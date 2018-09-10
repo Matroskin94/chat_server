@@ -90,6 +90,7 @@ class Content extends PureComponent {
                         <FormItem>
                             <Button
                                 type='primary'
+                                htmlType='submit'
                                 onClick={this.handleRegistrationClick}
                                 className={styles.loginButton}
                             >

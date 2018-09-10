@@ -5,12 +5,13 @@ import { uniqueId } from 'lodash';
 import { Card, Avatar, Alert } from 'antd';
 import 'antd/lib/menu/style';
 
-
 import RenderAlert from './RenderAlert.jsx';
+
+import { noop } from '../../../clientServices/utils/common';
 
 import chatStyles from '../styles/chatStyles.less';
 
-const MessagesList = ({ messagesList }) => {
+const MessagesList = ({ messagesList, setInputRef }) => {
     const renderMessage = message => (message.isServiseMessage ?
         (<Alert
             key={uniqueId()}
@@ -39,17 +40,19 @@ const MessagesList = ({ messagesList }) => {
     );
 
     return (
-        <div className={chatStyles.messagesContainer}>
+        <div ref={setInputRef} className={chatStyles.messagesContainer}>
             {messagesList.map(mess => renderMessage(mess))}
         </div>
     );
 };
 
 MessagesList.propTypes = {
-    messagesList: PropTypes.array
+    messagesList: PropTypes.array,
+    setInputRef: PropTypes.func
 };
 
 MessagesList.defaultProps = {
+    setInputRef: noop,
     messagesList: []
 };
 

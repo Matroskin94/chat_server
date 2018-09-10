@@ -40,7 +40,9 @@ class Content extends PureComponent {
         }
     }
 
-    handleLoginClick = () => {
+    handleLoginClick = e => {
+        e.preventDefault();
+
         const { password, userLogin } = { ...this.state };
         const { onLoginClick } = this.props;
 
@@ -90,6 +92,7 @@ class Content extends PureComponent {
                         <FormItem>
                             <Button
                                 type='primary'
+                                htmlType='submit'
                                 onClick={this.handleLoginClick}
                                 className={styles.loginButton}
                             >
