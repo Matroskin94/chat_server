@@ -23,14 +23,21 @@
     }
 
     .messagesContainer{
-        flex: 1 0 auto;
+        flex: 0 1 auto;
         height: 73vh;
         padding: 5px 0;
         overflow-x: hidden;
     }
 
     .inputContainer {
+        display: flex;
         height: 40px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .inputContainer button {
+        margin-left: 10px;
     }
 
     .cardStyle {

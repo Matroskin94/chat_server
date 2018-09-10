@@ -11,7 +11,7 @@ const http = require('http');
 const socket = require('socket.io');
 
 const corsOptions = {
-  origin: ['http://localhost:8080', 'http://127.0.0.1:8081'], // app port Не работает если указать 127.0.0.1
+  origin: true, // app port Не работает если указать 127.0.0.1
   optionsSuccessStatus: 200,
   credentials: true
 }
