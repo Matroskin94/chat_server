@@ -25,6 +25,7 @@
     .contentContainer {
         padding: 0 50px;
         margin-top: 64px;
+        min-width: 320px;
     }
 
     .contentContainer h3 {
@@ -32,6 +33,7 @@
     }
 
     .sider {
+        width: 60px;
         margin-left: 10px;
         height: calc(100vh - 88px);
     }
@@ -39,6 +41,16 @@
     .sider ul {
         overflow: auto;
         height: calc(100vh - 120px);
+    }
+
+    @media (max-width: 400px) {
+        .contentContainer {
+            padding: 0 5px;
+        }
+
+        .header {
+            padding: 0 5px;
+        }
     }
 
 }

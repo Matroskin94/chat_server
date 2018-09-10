@@ -8,11 +8,7 @@ import {
     Header as AntHeader,
     Content as AntContent
 } from 'antd/lib/layout';
-import { Layout, Input } from 'antd';
-import 'antd/lib/menu/style';
-import 'antd/lib/layout/style';
-import 'antd/lib/button/style';
-import 'antd/lib/input/style';
+import { Layout, Input, Form } from 'antd';
 
 import history from '../HOC/History.jsx';
 import withUser from '../HOC/WithUser.jsx';
@@ -100,7 +96,8 @@ class Content extends Component {
         });
     }
 
-    handleSendMessage = () => {
+    handleSendMessage = e => {
+        e.preventDefault();
         const { socket, message } = this.state;
         const { user } = this.props;
 
@@ -114,10 +111,13 @@ class Content extends Component {
         };
 
         socket.emit(SOCKET_API.SEND_MESSAGE, messageObj);
+
         this.setState(prevState => ({
             messageList: prevState.messageList.concat(messageObj),
             message: ''
-        }));
+        }), () => {
+            this.messageInputRef.scrollTop = this.messageInputRef.scrollHeight;
+        });
     }
 
     handleLogOut = () => {
@@ -131,12 +131,16 @@ class Content extends Component {
         });
     }
 
+    setmessageInputRef = element => {
+        this.messageInputRef = element;
+    };
+
     updateScreenSize = () => {
         const { isMobile } = this.props;
         const { isCollapsed } = this.state;
 
         if (isMobile !== isCollapsed) {
-            this.setState({ isCollapsed: isMobile});
+            this.setState({ isCollapsed: isMobile });
         }
     }
 
@@ -170,6 +174,8 @@ class Content extends Component {
         this.setState(prevState => ({
             messageList: prevState.messageList.concat(mess)
         }), () => {
+            this.messageInputRef.scrollTop = this.messageInputRef.scrollHeight;
+
             if (mess.isServiseMessage) {
                 serviceSound.play();
             } else {
@@ -205,17 +211,28 @@ class Content extends Component {
                             </h3>
                             <hr />
                         </div>
-                        <MessagesList messagesList={messageList} styles={chatStyles} />
-                        <div className={chatStyles.inputContainer}>
-                            <Input placeholder='Сообщение...' onChange={this.handleInputChange} />
+                        <MessagesList
+                            messagesList={messageList}
+                            styles={chatStyles}
+                            setInputRef={this.setmessageInputRef}
+                        />
+                        <Form onSubmit={this.handleSendMessage} className={chatStyles.inputContainer}>
+                            <Input
+                                placeholder='Сообщение...'
+                                onChange={this.handleInputChange}
+                                value={message}
+                                onSubmit={this.handleSendMessage}
+                            />
                             <Button
+                                disabled={!message}
+                                className={chatStyles.sendButton}
                                 type='primary'
                                 shape='circle'
                                 icon='notification'
                                 onClick={this.handleSendMessage}
-                                size={32}
+                                size='default'
                             />
-                        </div>
+                        </Form>
                     </AntContent>
                     <UsersList
                         isCollapsed={isCollapsed}

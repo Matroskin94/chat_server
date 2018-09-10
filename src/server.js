@@ -67,6 +67,10 @@ function startServer(mongoose) {
                 });
             });
         });
+
+        socket.on('disconnect', (reason) => {
+            console.log('DISCONNECTED:', reason);
+        });
     });
 }
 
