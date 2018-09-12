@@ -12,7 +12,7 @@
             "experimentalObjectRestSpread": true,
             "jsx": true
         },
-        "sourceType": "module"
+        "sourceType": ["module", "script"]
     },
     "plugins": [
         "react"
@@ -300,7 +300,6 @@
                 "amd": false
             }
         ],
-        "import/no-commonjs": 2,
         "import/named": 2,
         "import/namespace": 2,
         "import/default": 2,

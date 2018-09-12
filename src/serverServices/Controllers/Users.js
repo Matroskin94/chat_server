@@ -41,7 +41,3 @@ exports.setUserOnline = userLogin => {
 exports.disconnectUser = userLogin => {
     return userModel.disconnectUser(userLogin);
 }
-
-exports.disconnectUserTab = (mongoose, sesionId) => {
-    return userModel.disconnectUserTab(mongoose, sesionId);
-}
