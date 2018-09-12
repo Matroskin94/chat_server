@@ -1,13 +1,11 @@
-/* eslint-disable */
-
-const http = require('http');
-const socket = require('socket.io');
+/*eslint-disable*/
 
 const db = require('./serverServices/db');
 const userController = require('./serverServices/Controllers/Users');
+const sessionController = require('./serverServices/Controllers/Sessions');
 const configureServer = require('./serverServices/serverConfiguration');
 
-db.connect('mongodb://127.0.0.1:27017/mongo_test', startServer);
+const SERVER_MESSAGES = require('./constants/serverMessages');
 
 function startServer(mongoose) {
     const { app, io } = configureServer(mongoose);
@@ -21,11 +19,13 @@ function startServer(mongoose) {
     // POST: /isAuthenticated - проверка авторизирован ли пользователь
     app.post('/isAuthenticated', userController.isAuthenticated);
 
+    app.get('/clearSessions', sessionController.clearSessionCollection(mongoose));
+
     io.on('connection', socket => {
         if (socket.request.session.passport) {
-            const userLogin = socket.request.session.passport.user.userLogin;
+            const { userLogin } = socket.request.session.passport.user;
 
-            userController.setUserOnline(userLogin).then((res) => {
+            userController.setUserOnline(userLogin).then(res => {
                 socket.broadcast.emit('connectedUser', userLogin);
                 userController.getOnlineUsers().then(result => {
                     socket.broadcast.emit('onlineUsers', result);
@@ -50,11 +50,11 @@ function startServer(mongoose) {
         });
 
         socket.on('userLogout', () => {
-            const userLogin = socket.request.session.passport.user.userLogin;
+            const { userLogin } = socket.request.session.passport.user;
 
             socket.request.logout();
             socket.request.session.destroy(() => {
-                return userController.isUserDisconnected(mongoose, userLogin).then( () => {
+                return userController.isUserDisconnected(mongoose, userLogin).then(() => {
                     socket.broadcast.emit('userDisconnected', userLogin);
                 }).catch(err => {
                     console.log(err);
@@ -68,9 +68,30 @@ function startServer(mongoose) {
             });
         });
 
-        socket.on('disconnect', (reason) => {
-            console.log('DISCONNECTED:', reason);
+        socket.on('disconnecting', reason => {
+            const tabClosed = SERVER_MESSAGES.SESSION_DELAYED_CHROME
+                || SERVER_MESSAGES.SESSION_DELAYED_MOZILA;
+
+            if (tabClosed === reason && socket.request.session) {
+                const { userLogin } = socket.request.session.passport.user;
+
+                sessionController.disconnectUserTab(mongoose, socket.request.sessionID).then(res => {
+                    const { tabsCount } = JSON.parse(res.value.session);
+
+                    if (tabsCount === 0) {
+                        return userController.isUserDisconnected(mongoose, userLogin).then(() => {
+                            socket.broadcast.emit('userDisconnected', userLogin);
+                            userController.getOnlineUsers().then(result => {
+                                socket.broadcast.emit('onlineUsers', result);
+                            });
+                        }).catch(err => {
+                            console.log('ERRR', err);
+                        });
+                    }
+                });
+            }
         });
     });
 }
 
+db.connect('mongodb://127.0.0.1:27017/mongo_test', startServer);

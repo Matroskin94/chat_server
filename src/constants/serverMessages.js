@@ -8,7 +8,8 @@ const SERVER_MESSAGES = {
     INCORRECT_PASS: 'Неверный пароль',
     AUTHORIZATION_ERROR: 'Ошибка авторизации',
     PASSWORD_REQUIRED: 'Введите пароль',
-    SESSION_DELAYED: 'transport error',
+    SESSION_DELAYED_CHROME: 'transport error',
+    SESSION_DELAYED_MOZILA: 'transport close',
     SESSION_DESTROYED: 'server namespace disconnect'
 };
 

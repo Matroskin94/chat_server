@@ -2,9 +2,11 @@
 const bcrypt = require('bcrypt');
 
 const objectID = require('mongodb').ObjectID;
-const UserSchema = require('../DataShemes/UserSchema');
+const UserModel = require('../DataModels/UserModel');
 const SERVER_MESSAGES = require('../../constants/serverMessages');
 const passport = require('passport');
+
+const sessionUtils = require('../utils/sessionUtils.js');
 
 const saltRounds = 10;
 
@@ -18,6 +20,12 @@ passport.deserializeUser(function(user_id, done) {
 
 exports.isAuthenticated = (req, cb) => {
     if (req.isAuthenticated()) {
+        if (!req.session.tabsCount) {
+            req.session.tabsCount = 1;
+        } else {
+            req.session.tabsCount++;
+        }
+
         return cb('', req.session.passport.user);
     }
     return cb({ message: SERVER_MESSAGES.NOT_AUTHENTICATED, code: 401}, '');
@@ -26,7 +34,7 @@ exports.isAuthenticated = (req, cb) => {
 exports.addUser = (req, cb) => {
     const creatingUser = req.body;
 
-    UserSchema.findOne({ userLogin: creatingUser.userLogin }).then(result => {
+    UserModel.findOne({ userLogin: creatingUser.userLogin }).then(result => {
         if (!result) {
             if (creatingUser.password === '') {
                 return cb({
@@ -37,7 +45,7 @@ exports.addUser = (req, cb) => {
             }
 
             return bcrypt.hash(creatingUser.password, saltRounds, function(err, hash) {
-                const user = new UserSchema({
+                const user = new UserModel({
                     ...creatingUser,
                     password: hash
                 });
@@ -65,7 +73,7 @@ exports.addUser = (req, cb) => {
 exports.checkUser = (req, cb) => {
     const enteringUser = req.body;
 
-    UserSchema.findOne({ userLogin: enteringUser.userLogin })
+    UserModel.findOne({ userLogin: enteringUser.userLogin })
         .then(resUser => {
             if (!resUser) {
                 return cb({message: SERVER_MESSAGES.NO_USER, field: 'userLogin', code: 500}, '');
@@ -96,7 +104,7 @@ exports.checkUser = (req, cb) => {
 };
 
 exports.logoutUser = (userId, cb) => {
-    UserSchema.updateOne({ _id: objectID(userId) }, { isOnline: false }, (err, res) => {
+    UserModel.updateOne({ _id: objectID(userId) }, { isOnline: false }, (err, res) => {
         if (err) {
             console.log('LOGOUT ERROR', err);
         }
@@ -105,7 +113,7 @@ exports.logoutUser = (userId, cb) => {
 };
 
 exports.getOnlineUsers = () => {
-    return UserSchema.find({ isOnline: true }, (err, res) => {
+    return UserModel.find({ isOnline: true }, (err, res) => {
         if (!err) {
             return res;
         }
@@ -117,16 +125,31 @@ exports.isUserDisconnected = (mongoose, userLogin) => {
 
     return new Promise((resolve, reject) => {
         mongoose.connection.db.collection('sessions')
-        .findOne({ session: { $regex: searchStr } }, (err, resUser) => {
-            if (resUser) reject('NOT ALL SESSIONS CLOSED');
-            resolve(userLogin);
+        .find({ session: { $regex: searchStr } }, (err, resUser) => {
+            if (resUser) {
+                return resUser.toArray().then(res => {
+                    const isDisconnected = res.every(item => {
+                        if (item.session.indexOf(`"tabsCount":0`) > -1) {
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    if (isDisconnected) {
+                        return module.exports.disconnectUser(userLogin).then(() => {
+                            resolve(userLogin);
+                        });
+                    }
+                    reject('NOT ALL SESSIONS CLOSED');
+                });
+            }
         });
     });
 }
 
 exports.disconnectUser = userLogin => {
     return new Promise((resolve, reject) => {
-        UserSchema.findOneAndUpdate({ userLogin: userLogin }, { $set: { isOnline: false }})
+        UserModel.findOneAndUpdate({ userLogin: userLogin }, { $set: { isOnline: false }})
         .then(resolve)
         .catch(err => {
             reject('UPDATING USER ERROR (NOT DISCONNECTED)');
@@ -136,7 +159,7 @@ exports.disconnectUser = userLogin => {
 
 exports.setUserOnline = userLogin => {
     return new Promise((resolve, reject) => {
-        UserSchema.findOneAndUpdate({ userLogin }, { isOnline: true }, (err, res) => {
+        UserModel.findOneAndUpdate({ userLogin }, { isOnline: true }, (err, res) => {
             if (!res.isOnline) {
                 resolve();
             }
@@ -144,3 +167,4 @@ exports.setUserOnline = userLogin => {
         });
     });
 }
+
