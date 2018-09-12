@@ -7,6 +7,8 @@ const db = require('./serverServices/db');
 const userController = require('./serverServices/Controllers/Users');
 const configureServer = require('./serverServices/serverConfiguration');
 
+const SERVER_MESSAGES = require('./constants/serverMessages');
+
 db.connect('mongodb://127.0.0.1:27017/mongo_test', startServer);
 
 function startServer(mongoose) {
@@ -68,8 +70,25 @@ function startServer(mongoose) {
             });
         });
 
-        socket.on('disconnect', (reason) => {
-            console.log('DISCONNECTED:', reason);
+        socket.on('disconnecting', reason => {
+            const userLogin = socket.request.session.passport.user.userLogin;
+            const tabClosed = SERVER_MESSAGES.SESSION_DELAYED_CHROME ||
+                SERVER_MESSAGES.SESSION_DELAYED_MOZILA;
+
+            if (tabClosed) {
+                userController.disconnectUserTab(mongoose, socket.request.sessionID).then((res) => {
+                    const { tabsCount } = JSON.parse(res.value.session);
+
+                    if (tabsCount === 0) {
+                        return userController.isUserDisconnected(mongoose, userLogin).then(() => {
+                            console.log('DISCONNECTING!!!');
+                            socket.broadcast.emit('userDisconnected', userLogin);
+                        }).catch(err => {
+                            console.log('ERRR', err);
+                        });
+                    }
+                });
+            }
         });
     });
 }

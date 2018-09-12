@@ -1,4 +1,4 @@
-const HOST = 'http://localhost';
+const HOST = process.env.REACT_APP_HOST || '';
 const PORT = '8000';
 const BASE_URL = `${HOST}${PORT ? `:${PORT}` : ''}`;
 

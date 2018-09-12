@@ -6,6 +6,8 @@ const UserSchema = require('../DataShemes/UserSchema');
 const SERVER_MESSAGES = require('../../constants/serverMessages');
 const passport = require('passport');
 
+const sessionUtils = require('../utils/sessionUtils.js');
+
 const saltRounds = 10;
 
 passport.serializeUser(function(user_id, done) {
@@ -18,6 +20,12 @@ passport.deserializeUser(function(user_id, done) {
 
 exports.isAuthenticated = (req, cb) => {
     if (req.isAuthenticated()) {
+        if (!req.session.tabsCount) {
+            req.session.tabsCount = 1;
+        } else {
+            req.session.tabsCount++;
+        }
+
         return cb('', req.session.passport.user);
     }
     return cb({ message: SERVER_MESSAGES.NOT_AUTHENTICATED, code: 401}, '');
@@ -117,9 +125,20 @@ exports.isUserDisconnected = (mongoose, userLogin) => {
 
     return new Promise((resolve, reject) => {
         mongoose.connection.db.collection('sessions')
-        .findOne({ session: { $regex: searchStr } }, (err, resUser) => {
-            if (resUser) reject('NOT ALL SESSIONS CLOSED');
-            resolve(userLogin);
+        .find({ session: { $regex: searchStr } }, (err, resUser) => {
+            if (resUser) {
+                return resUser.toArray().then(res => {
+                    const isDisconnected = res.every(item => {
+                        if (item.session.indexOf(`"tabsCount":0`) > -1) {
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    if (isDisconnected) resolve(userLogin);
+                    reject('NOT ALL SESSIONS CLOSED');
+                });
+            }
         });
     });
 }
@@ -142,5 +161,39 @@ exports.setUserOnline = userLogin => {
             }
             reject('USER ALREADY ONLINE');
         });
+    });
+}
+
+// TODO: Refactor this method, store tabs count in User Model
+
+exports.disconnectUserTab = (mongoose, sessionId) => {
+    return new Promise((resolve, reject) => {
+        mongoose.connection.db.collection('sessions')
+        .findOne({ _id: sessionId }, (err, resSession) => {
+            if (resSession) {
+                resolve(resSession)
+            }
+            reject(err);
+        });
+    }).then(sess => {
+        const parsedSession = JSON.parse(sess.session);
+        parsedSession.tabsCount--;
+
+        return new Promise((resolve, reject) => {
+            mongoose.connection.db.collection('sessions')
+            .findOneAndUpdate(
+                { '_id': sessionId },
+                { $set: { session: JSON.stringify(parsedSession) } },
+                { returnOriginal:false },
+                (err, ress) => {
+                    if (err) {
+                        reject(err)
+                    }
+                    resolve(ress);
+            });
+        })
+
+    }).catch(err => {
+        console.log('DISCONNECTING TABS ERROR', err);
     });
 }
