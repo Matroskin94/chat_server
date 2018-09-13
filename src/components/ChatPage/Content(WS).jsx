@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 
 class Content extends Component {
     state = {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 
 import { subscribeToTimer, sendMessage, getMessages } from '../../serverServices/api(Socket_IO)';
 

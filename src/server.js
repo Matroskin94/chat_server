@@ -72,7 +72,7 @@ function startServer(mongoose) {
             const tabClosed = SERVER_MESSAGES.SESSION_DELAYED_CHROME
                 || SERVER_MESSAGES.SESSION_DELAYED_MOZILA;
 
-            if (tabClosed === reason && socket.request.session) {
+            if (tabClosed === reason && socket.request.session.passport) {
                 const { userLogin } = socket.request.session.passport.user;
 
                 sessionController.disconnectUserTab(mongoose, socket.request.sessionID).then(res => {

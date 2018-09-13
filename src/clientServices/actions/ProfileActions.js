@@ -1,5 +1,5 @@
 import { fetchStart, fetchEnd } from './NetworkActions';
-import { LOGIN_SUCCESS } from '../../constants/clientConstants/constants';
+import { LOGIN_SUCCESS, LOG_OUT } from '../../constants/clientConstants/constants';
 import ProfileService from '../services/ProfileService';
 
 export function loginSuccessAction(userData) {
@@ -10,6 +10,12 @@ export function loginSuccessAction(userData) {
     return ({
         type: LOGIN_SUCCESS,
         payload: userState
+    });
+}
+
+export function logOutAction() {
+    return ({
+        type: LOG_OUT
     });
 }
 

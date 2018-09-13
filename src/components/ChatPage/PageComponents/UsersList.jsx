@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import classnames from 'classnames';
 
-import { Menu, Icon } from 'antd';
+import Menu from 'antd/lib/menu';
+import Icon from 'antd/lib/icon';
 import { Sider } from 'antd/lib/layout';
-import 'antd/lib/menu/style';
 
 import { noop } from '../../../clientServices/utils/common';
 

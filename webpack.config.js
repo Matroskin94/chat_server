@@ -3,6 +3,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const Dotenv = require('dotenv-webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const PRODUCTION_MODE = process.env.NODE_ENV.trim() === 'production';
 
@@ -13,6 +14,7 @@ module.exports = {
         filename: 'bundle.js'
     },
     plugins: [
+        // new BundleAnalyzerPlugin(),
         new Dotenv(),
         new ExtractTextPlugin({
             filename: 'style-[contenthash].css',

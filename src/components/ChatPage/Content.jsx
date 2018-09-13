@@ -3,14 +3,18 @@ import io from 'socket.io-client';
 import PropTypes from 'prop-types';
 import withSizes from 'react-sizes';
 
-import Button from 'antd/lib/button';
 import {
     Header as AntHeader,
     Content as AntContent
 } from 'antd/lib/layout';
-import { Layout, Input, Form } from 'antd';
+import {
+    Layout,
+    Input,
+    Form,
+    Button
+} from 'antd';
 
-import history from '../HOC/History.jsx';
+import witHistory from '../HOC/History.jsx';
 import withUser from '../HOC/WithUser.jsx';
 import UsersList from './PageComponents/UsersList.jsx';
 import MessagesList from './PageComponents/MessagesList.jsx';
@@ -26,21 +30,21 @@ import servSound from '../../assets/ServiceMessage_sound.mp3';
 import chatStyles from './styles/chatStyles.less';
 import commonStyles from './styles/commonStyles.less';
 
-@history()
+@witHistory()
 @withUser()
 @withSizes(({ width }) => ({ isMobile: width < 580 }))
 class Content extends Component {
     static propTypes = {
         user: PropTypes.object,
-        onCheckAuthentication: PropTypes.func, // withUser HOC
-        historyPush: PropTypes.func,
+        logOutUser: PropTypes.func, // withUser HOC
+        historyPush: PropTypes.func, // witHistory HOC
         isMobile: PropTypes.bool // withSizes HOC
 
     };
 
     static defaultProps = {
         user: {},
-        onCheckAuthentication: noop,
+        logOutUser: noop,
         historyPush: noop,
         isMobile: false
     }
@@ -56,30 +60,24 @@ class Content extends Component {
     };
 
     componentDidMount() {
-        const { onCheckAuthentication, historyPush } = this.props;
+        const sock = io(API.BASE_URL);
+        const { isMobile } = this.props;
 
-        onCheckAuthentication().then(res => {
-            const sock = io(API.BASE_URL);
-            const { isMobile } = this.props;
+        this.setState({ socket: sock, isCollapsed: isMobile }, () => {
+            const { socket } = this.state;
 
-            this.setState({ socket: sock, isCollapsed: isMobile }, () => {
-                const { socket } = this.state;
+            socket.emit(SOCKET_API.GET_ONLINE_USERS);
 
-                socket.emit(SOCKET_API.GET_ONLINE_USERS);
+            socket.on(SOCKET_API.ONLINE_USERS, this.showOnlineUsers);
 
-                socket.on(SOCKET_API.ONLINE_USERS, this.showOnlineUsers);
+            socket.on(SOCKET_API.CONNECTED_USER, this.showConnectedUser);
 
-                socket.on(SOCKET_API.CONNECTED_USER, this.showConnectedUser);
+            socket.on(SOCKET_API.USER_DISCONNECTED, this.showDisconnectedUser);
 
-                socket.on(SOCKET_API.USER_DISCONNECTED, this.showDisconnectedUser);
-
-                socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
-            });
-
-            window.addEventListener('resize', this.updateScreenSize);
-        }).catch(err => {
-            historyPush({ url: '/' });
+            socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
         });
+
+        window.addEventListener('resize', this.updateScreenSize);
     }
 
     componentWillUnmount() {
@@ -122,12 +120,13 @@ class Content extends Component {
 
     handleLogOut = () => {
         const { socket } = this.state;
-        const { historyPush } = this.props;
+        const { historyPush, logOutUser } = this.props;
 
         socket.emit(SOCKET_API.USER_LOGOUT);
 
         this.setState({ socket: null }, () => {
-            historyPush({ url: '/' });
+            logOutUser();
+            // historyPush({ url: '/' });
         });
     }
 

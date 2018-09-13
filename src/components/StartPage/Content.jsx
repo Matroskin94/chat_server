@@ -11,6 +11,7 @@ import {
 } from 'antd';
 
 import authorization from '../HOC/Authorization.jsx';
+import Loader from '../common/Loader/Loader.jsx';
 
 import { noop } from '../../clientServices/utils/common';
 
@@ -22,11 +23,13 @@ const FormItem = Form.Item;
 class Content extends PureComponent {
     static propTypes = {
         onLoginClick: PropTypes.func, // Функция из LoginHOC для авторизации пользователя
-        form: PropTypes.object
+        form: PropTypes.object,
+        isFetching: PropTypes.bool // authorization HOC
     };
 
     static defaultProps = {
         onLoginClick: noop,
+        isFetching: false,
         form: {}
     };
 
@@ -36,7 +39,8 @@ class Content extends PureComponent {
         profileError: '',
         errorFields: {
             userLogin: '',
-            password: ''
+            password: '',
+            noField: ''
         }
     }
 
@@ -46,12 +50,7 @@ class Content extends PureComponent {
         const { password, userLogin } = { ...this.state };
         const { onLoginClick } = this.props;
 
-        onLoginClick({ password, userLogin }).then(() => {
-            this.setState({
-                profileError: '',
-                errorFields: { userLogin: '', password: '' }
-            });
-        }).catch(error => {
+        onLoginClick({ password, userLogin }).catch(error => {
             this.setState({
                 profileError: error.message,
                 errorFields: { [error.field]: 'error' }
@@ -63,6 +62,7 @@ class Content extends PureComponent {
 
     render() {
         const { profileError, errorFields } = this.state;
+        const { isFetching } = this.props;
 
         return (
             <div className={styles.pageContainer}>
@@ -100,9 +100,13 @@ class Content extends PureComponent {
                             </Button>
                             Или
                             <Link to='/registration'> зарегистрироваться</Link>
+                            <div hidden={!errorFields.noField} className={styles.commonError}>
+                                {profileError}
+                            </div>
                         </FormItem>
                     </Form>
                 </Card>
+                <Loader show={isFetching} />
             </div>
         );
     }
