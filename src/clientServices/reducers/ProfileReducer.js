@@ -1,9 +1,10 @@
-import { LOGIN_SUCCESS, LOGIN_FAILED } from '../../constants/clientConstants/constants';
+import { LOGIN_SUCCESS, LOGIN_FAILED, LOG_OUT } from '../../constants/clientConstants/constants';
 
 const initialState = {
     _id: 0,
     password: '',
-    userLogin: 'not authorized'
+    userLogin: 'not authorized',
+    isLoggedIn: false
 };
 
 export default function ProfileReducer(state = initialState, action) {
@@ -11,7 +12,8 @@ export default function ProfileReducer(state = initialState, action) {
         case LOGIN_SUCCESS: {
             return {
                 ...state,
-                ...action.payload
+                ...action.payload,
+                isLoggedIn: true
             };
         }
 
@@ -19,6 +21,13 @@ export default function ProfileReducer(state = initialState, action) {
             return {
                 ...state,
                 ...action.payload
+            };
+        }
+
+        case LOG_OUT: {
+            return {
+                ...state,
+                isLoggedIn: false
             };
         }
 

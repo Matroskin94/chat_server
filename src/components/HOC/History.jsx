@@ -7,10 +7,10 @@ export default () => WrappedComponent => {
             router: PropTypes.object.isRequired
         }
 
-        getURLParams = () => {
+        getRouteInfo = () => {
             const { router } = this.context;
 
-            return router.route.match.params;
+            return router.route.match;
         }
 
         historyPush = ({ url, query = '' }) => {
@@ -26,11 +26,13 @@ export default () => WrappedComponent => {
         }
 
         render() {
+            const routeInfo = this.getRouteInfo();
+
             return <WrappedComponent
                 {...this.props}
                 historyPush={this.historyPush}
                 historyBack={this.historyBack}
-                getURLParams={this.getURLParams}
+                routeInfo={routeInfo}
             />;
         }
     }

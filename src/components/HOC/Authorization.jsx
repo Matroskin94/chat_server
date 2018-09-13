@@ -9,6 +9,8 @@ import {
     registrationRequestAction
 } from '../../clientServices/actions/ProfileActions';
 
+import NETWORK_ERROR from '../../constants/clientConstants/errors';
+
 function mapDispatchToProps(dispatch) {
     return {
         checkUser: user => dispatch(loginRequestAction(user)),
@@ -41,12 +43,14 @@ export default () => WrappedComponent => {
         };
 
         handleLoginClick = user => {
-            const { checkUser, historyPush } = this.props;
+            const { checkUser } = this.props;
 
-            return checkUser(user).then(response => {
-                historyPush({ url: '/chat' });
-            }).catch(err => {
-                throw err.data;
+            return checkUser(user).catch(err => {
+                if (err) {
+                    throw err.data;
+                }
+
+                throw NETWORK_ERROR;
             });
         }
 

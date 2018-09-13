@@ -7,6 +7,9 @@ import initStore from '../store/appStore';
 import StartPage from './StartPage.jsx';
 import ChatPage from './ChatPage.jsx';
 import RegistrationPage from './RegistrationPage.jsx';
+import AuthProvider from './AuthProvider.jsx';
+
+import ROUTES from '../constants/clientConstants/routes';
 
 import './index.css';
 
@@ -15,15 +18,17 @@ const store = initStore();
 const AppRouter = props => (
     <Provider store={store}>
         <BrowserRouter>
-            <Switch>
-                <Route
-                    exact
-                    path='/'
-                    component={StartPage}
-                />
-                <Route path='/registration' component={RegistrationPage} />
-                <Route path='/chat' component={ChatPage} />
-            </Switch>
+            <AuthProvider>
+                <Switch>
+                    <Route
+                        exact
+                        path={ROUTES.BASE}
+                        component={StartPage}
+                    />
+                    <Route path={ROUTES.REGISTRATION} component={RegistrationPage} />
+                    <Route path={ROUTES.CHAT} component={ChatPage} />
+                </Switch>
+            </AuthProvider>
         </BrowserRouter>
     </Provider>
 );

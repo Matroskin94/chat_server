@@ -5,22 +5,27 @@ import { connect } from 'react-redux';
 import { noop } from '../../clientServices/utils/common';
 import {
     checkAuthentication,
-    loginSuccessAction
+    loginSuccessAction,
+    logOutAction
 } from '../../clientServices/actions/ProfileActions';
+
+import NETWORK_ERROR from '../../constants/clientConstants/errors';
 
 function mapStateToProps(state) {
     return {
         user: {
             userLogin: state.profileReducer.userLogin,
             password: state.profileReducer.password
-        }
+        },
+        isLoggedIn: state.profileReducer.isLoggedIn
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         isAuthenticated: () => dispatch(checkAuthentication()),
-        loginUser: user => dispatch(loginSuccessAction(user))
+        logInUser: user => dispatch(loginSuccessAction(user)),
+        logOutUser: () => dispatch(logOutAction())
     };
 }
 
@@ -29,31 +34,39 @@ export default () => WrappedComponent => {
     class WithUserHOC extends PureComponent {
         static propTypes = {
             checkAuthentication: PropTypes.func,
-            user: PropTypes.object
+            user: PropTypes.object,
+            isLoggedIn: PropTypes.bool
         };
 
         static defaultProps = {
             checkAuthentication: noop,
-            user: {}
+            user: {},
+            isLoggedIn: false
         };
 
         handleAuthenticationCheck = () => {
-            const { isAuthenticated, loginUser } = this.props;
+            const { isAuthenticated, logInUser } = this.props;
 
             return isAuthenticated().then(response => {
-                loginUser(response);
+                logInUser(response);
             }).catch(err => {
-                throw err.data;
+                if (err) {
+                    throw err.data;
+                } else {
+                    throw new Error(NETWORK_ERROR);
+                }
             });
         }
 
         render() {
-            const { user } = this.props;
+            const { user, logOutUser, isLoggedIn } = this.props;
 
             return (
                 <WrappedComponent
                     {...this.props}
                     user={user}
+                    isLoggedIn={isLoggedIn}
+                    logOutUser={logOutUser}
                     onCheckAuthentication={this.handleAuthenticationCheck}
                 />
             );
