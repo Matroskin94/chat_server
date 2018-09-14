@@ -20,24 +20,23 @@
 
     .chatHeader {
         height: 45px;
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
     }
 
     .messagesContainer{
-        flex: 0 1 auto;
-        height: 73vh;
+        flex: 1 1 auto;
         padding: 5px 0;
         overflow-x: hidden;
     }
 
     .inputContainer {
         display: flex;
+        flex-shrink: 0;
         height: 40px;
         align-items: center;
         justify-content: space-between;
-    }
-
-    .inputContainer button {
-        margin-left: 10px;
     }
 
     .cardStyle {
@@ -60,7 +59,8 @@
         margin-bottom: 0;
     }
 
-    .sendButton {
+    .button {
         flex-shrink: 0;
+        margin-left: 10px;
     }
 }
