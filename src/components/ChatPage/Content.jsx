@@ -11,13 +11,14 @@ import {
     Layout,
     Input,
     Form,
-    Button
+    Button,
+    Divider
 } from 'antd';
 
-import witHistory from '../HOC/History.jsx';
 import withUser from '../HOC/WithUser.jsx';
-import UsersList from './PageComponents/UsersList.jsx';
+import SideBar from './PageComponents/SideBar/SideBar.jsx';
 import MessagesList from './PageComponents/MessagesList.jsx';
+import LogoutIcon from '../common/Icons/LogoutIcon.jsx';
 
 import { noop } from '../../clientServices/utils/common';
 
@@ -30,14 +31,13 @@ import servSound from '../../assets/ServiceMessage_sound.mp3';
 import chatStyles from './styles/chatStyles.less';
 import commonStyles from './styles/commonStyles.less';
 
-@witHistory()
+
 @withUser()
 @withSizes(({ width }) => ({ isMobile: width < 580 }))
 class Content extends Component {
     static propTypes = {
         user: PropTypes.object,
         logOutUser: PropTypes.func, // withUser HOC
-        historyPush: PropTypes.func, // witHistory HOC
         isMobile: PropTypes.bool // withSizes HOC
 
     };
@@ -45,7 +45,6 @@ class Content extends Component {
     static defaultProps = {
         user: {},
         logOutUser: noop,
-        historyPush: noop,
         isMobile: false
     }
 
@@ -88,6 +87,10 @@ class Content extends Component {
         this.setState({ isCollapsed: collapsed });
     }
 
+    handleOpenList = () => {
+        this.setState(prevState => ({ isCollapsed: !prevState.isCollapsed}));
+    }
+
     handleInputChange = e => {
         this.setState({
             message: e.target.value
@@ -120,13 +123,12 @@ class Content extends Component {
 
     handleLogOut = () => {
         const { socket } = this.state;
-        const { historyPush, logOutUser } = this.props;
+        const { logOutUser } = this.props;
 
         socket.emit(SOCKET_API.USER_LOGOUT);
 
         this.setState({ socket: null }, () => {
             logOutUser();
-            // historyPush({ url: '/' });
         });
     }
 
@@ -190,7 +192,8 @@ class Content extends Component {
             usersList,
             isCollapsed
         } = this.state;
-        const { user } = this.props;
+        const { user, isMobile } = this.props;
+        const onCollapse = isMobile ? this.handleOpenList : this.onCollapse;
 
         return (
             <Layout>
@@ -200,15 +203,23 @@ class Content extends Component {
                         {` ${user.userLogin}`}
                         !
                     </h3>
-                    <Button onClick={this.handleLogOut}>Выйти</Button>
+                    <LogoutIcon
+                        className={commonStyles.hoverPointer}
+                        onClick={this.handleLogOut}
+                    />
                 </AntHeader>
                 <Layout className={commonStyles.contentContainer}>
                     <AntContent className={chatStyles.chatContainer}>
                         <div className={chatStyles.chatHeader}>
-                            <h3>
-                                Чат Node.js
-                            </h3>
-                            <hr />
+                            <Divider>Чат Node.js</Divider>
+                            <Button
+                                hidden={!isMobile}
+                                className={chatStyles.button}
+                                onClick={this.handleOpenList}
+                                shape='circle'
+                                icon='team'
+                                type='primary'
+                            />
                         </div>
                         <MessagesList
                             messagesList={messageList}
@@ -224,7 +235,7 @@ class Content extends Component {
                             />
                             <Button
                                 disabled={!message}
-                                className={chatStyles.sendButton}
+                                className={chatStyles.button}
                                 type='primary'
                                 shape='circle'
                                 icon='notification'
@@ -233,10 +244,11 @@ class Content extends Component {
                             />
                         </Form>
                     </AntContent>
-                    <UsersList
+                    <SideBar
+                        isMobile={isMobile}
                         isCollapsed={isCollapsed}
                         usersList={usersList}
-                        handleCollapse={this.onCollapse}
+                        handleCollapse={onCollapse}
                     />
                 </Layout>
             </Layout>
