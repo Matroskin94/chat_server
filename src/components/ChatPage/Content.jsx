@@ -88,7 +88,7 @@ class Content extends Component {
     }
 
     handleOpenList = () => {
-        this.setState(prevState => ({ isCollapsed: !prevState.isCollapsed}));
+        this.setState(prevState => ({ isCollapsed: !prevState.isCollapsed }));
     }
 
     handleInputChange = e => {
