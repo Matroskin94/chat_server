@@ -55,6 +55,7 @@ exports.addUser = (req, cb) => {
                     password: user.password,
                 };
 
+                req.session.tabsCount = 1;
                 req.login(userCreeds, err => {
                     if (err) {
                         return cb({ message: SERVER_MESSAGES.AUTHORIZATION_ERROR, code: 500 }, '');
@@ -87,6 +88,7 @@ exports.checkUser = (req, cb) => {
                         password: resUser.password,
                     };
 
+                    req.session.tabsCount = 1;
                     return req.login(userCreeds, err => {
                         if (err) {
                             return cb({ message: SERVER_MESSAGES.AUTHORIZATION_ERROR, code: 500 }, '');
