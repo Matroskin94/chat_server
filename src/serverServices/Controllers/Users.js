@@ -41,3 +41,7 @@ exports.setUserOnline = userLogin => {
 exports.disconnectUser = userLogin => {
     return userModel.disconnectUser(userLogin);
 }
+
+exports.setUserTyping = user => {
+    return userModel.setUserTyping(user);
+}

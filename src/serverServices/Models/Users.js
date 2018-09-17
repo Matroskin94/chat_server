@@ -170,3 +170,11 @@ exports.setUserOnline = userLogin => {
     });
 }
 
+exports.setUserTyping = user => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+
+        }, 2000);
+    });
+}
+
