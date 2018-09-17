@@ -49,6 +49,10 @@ function startServer(mongoose) {
             socket.broadcast.emit('recieveMessage', message);
         });
 
+        socket.on('sendUserTiping', user => {
+            socket.broadcast.emit('recieveUserTyping', user);
+        });
+
         socket.on('userLogout', () => {
             const { userLogin } = socket.request.session.passport.user;
 

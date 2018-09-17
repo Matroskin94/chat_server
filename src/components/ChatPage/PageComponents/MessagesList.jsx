@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import uniqueId from 'lodash/uniqueId';
 
@@ -6,13 +6,27 @@ import { Card, Avatar, Alert } from 'antd';
 import 'antd/lib/menu/style';
 
 import RenderAlert from './RenderAlert.jsx';
+// import PencilIcon from '../../common/Icons/PencilIcon.jsx';
+import Marker from '../../common/Marker/Marker.jsx';
 
 import { noop } from '../../../clientServices/utils/common';
 
 import chatStyles from '../styles/chatStyles.less';
 
-const MessagesList = ({ messagesList, setInputRef }) => {
-    const renderMessage = message => (message.isServiseMessage ?
+class MessagesList extends PureComponent {
+    static propTypes = {
+        messagesList: PropTypes.array,
+        typingUsers: PropTypes.array,
+        setInputRef: PropTypes.func
+    };
+
+    static defaultProps = {
+        setInputRef: noop,
+        messagesList: [],
+        typingUsers: []
+    };
+
+    renderMessage = message => (message.isServiseMessage ?
         (<Alert
             key={uniqueId()}
             message={<RenderAlert message={message} />}
@@ -39,21 +53,24 @@ const MessagesList = ({ messagesList, setInputRef }) => {
         )
     );
 
-    return (
-        <div ref={setInputRef} className={chatStyles.messagesContainer}>
-            {messagesList.map(mess => renderMessage(mess))}
-        </div>
-    );
-};
+    render() {
+        const { messagesList, setInputRef, typingUsers } = this.props;
 
-MessagesList.propTypes = {
-    messagesList: PropTypes.array,
-    setInputRef: PropTypes.func
-};
-
-MessagesList.defaultProps = {
-    setInputRef: noop,
-    messagesList: []
-};
+        return (
+            <Fragment>
+                <div ref={setInputRef} className={chatStyles.messagesContainer}>
+                    {messagesList.map(mess => this.renderMessage(mess))}
+                </div>
+                <div hidden={typingUsers.length === 0} className={chatStyles.markerContainer}>
+                    <Marker />
+                    <p>
+                        {typingUsers.map(user => (<b key={uniqueId()}>{`${user} `}</b>))}
+                        набирает сообщение.
+                    </p>
+                </div>
+            </Fragment>
+        );
+    }
+}
 
 export default MessagesList;

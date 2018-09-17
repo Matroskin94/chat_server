@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import io from 'socket.io-client';
 import PropTypes from 'prop-types';
 import withSizes from 'react-sizes';
+import uniq from 'lodash/uniq';
 
 import {
-    Header as AntHeader,
     Content as AntContent
 } from 'antd/lib/layout';
 import {
@@ -15,12 +15,13 @@ import {
     Divider
 } from 'antd';
 
-import withUser from '../HOC/WithUser.jsx';
 import SideBar from './PageComponents/SideBar/SideBar.jsx';
 import MessagesList from './PageComponents/MessagesList.jsx';
-import LogoutIcon from '../common/Icons/LogoutIcon.jsx';
+import Header from './Header.jsx';
 
-import { noop } from '../../clientServices/utils/common';
+import withUser from '../HOC/WithUser.jsx';
+
+import { TypingUser } from '../../clientServices/utils/common';
 
 import SOCKET_API from '../../constants/clientConstants/socketAPI';
 import API from '../../constants/clientConstants/api';
@@ -31,20 +32,17 @@ import servSound from '../../assets/ServiceMessage_sound.mp3';
 import chatStyles from './styles/chatStyles.less';
 import commonStyles from './styles/commonStyles.less';
 
-
 @withUser()
 @withSizes(({ width }) => ({ isMobile: width < 580 }))
 class Content extends Component {
     static propTypes = {
         user: PropTypes.object,
-        logOutUser: PropTypes.func, // withUser HOC
         isMobile: PropTypes.bool // withSizes HOC
 
     };
 
     static defaultProps = {
         user: {},
-        logOutUser: noop,
         isMobile: false
     }
 
@@ -52,6 +50,8 @@ class Content extends Component {
         usersList: [],
         message: '',
         socket: null,
+        typingUsers: [],
+        isTyping: false,
         messageList: [],
         isCollapsed: false,
         messageSound: new Audio(messSound),
@@ -74,6 +74,8 @@ class Content extends Component {
             socket.on(SOCKET_API.USER_DISCONNECTED, this.showDisconnectedUser);
 
             socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
+
+            socket.on(SOCKET_API.RECIEVE_USER_TYPING, this.recieveUserTyping);
         });
 
         window.addEventListener('resize', this.updateScreenSize);
@@ -92,6 +94,21 @@ class Content extends Component {
     }
 
     handleInputChange = e => {
+        const { socket, isTyping } = this.state;
+        const { user } = this.props;
+        const userTyping = new TypingUser(user.userLogin, true);
+
+        if (!isTyping) {
+            this.setState({ isTyping: true });
+            socket.emit(SOCKET_API.SEND_USER_TYPING, userTyping);
+
+            setTimeout(() => {
+                const userNotTyping = new TypingUser(user.userLogin, false);
+
+                socket.emit(SOCKET_API.SEND_USER_TYPING, userNotTyping);
+                this.setState({ isTyping: false });
+            }, 4000);
+        }
         this.setState({
             message: e.target.value
         });
@@ -102,6 +119,10 @@ class Content extends Component {
         const { socket, message } = this.state;
         const { user } = this.props;
 
+        if (message.trim() === '') {
+            return;
+        }
+
         const messageObj = {
             isServiseMessage: false,
             author: {
@@ -110,10 +131,13 @@ class Content extends Component {
             },
             text: message
         };
+        const userNotTyping = new TypingUser(user.userLogin, false);
 
+        socket.emit(SOCKET_API.SEND_USER_TYPING, userNotTyping);
         socket.emit(SOCKET_API.SEND_MESSAGE, messageObj);
 
         this.setState(prevState => ({
+            isTyping: false,
             messageList: prevState.messageList.concat(messageObj),
             message: ''
         }), () => {
@@ -123,13 +147,25 @@ class Content extends Component {
 
     handleLogOut = () => {
         const { socket } = this.state;
-        const { logOutUser } = this.props;
 
         socket.emit(SOCKET_API.USER_LOGOUT);
+    }
 
-        this.setState({ socket: null }, () => {
-            logOutUser();
-        });
+    recieveUserTyping = typingUser => {
+        if (typingUser.isTyping) {
+            this.setState(prevState => {
+                const updatedTypingList = uniq(prevState.typingUsers.concat(typingUser.userLogin));
+
+                return { typingUsers: updatedTypingList };
+            });
+        } else {
+            const { typingUsers } = this.state;
+            const updatedTypingList = typingUsers.filter(item => (
+                item !== typingUser.userLogin
+            ));
+
+            this.setState({ typingUsers: updatedTypingList });
+        }
     }
 
     setmessageInputRef = element => {
@@ -190,24 +226,15 @@ class Content extends Component {
             message,
             messageList,
             usersList,
-            isCollapsed
+            isCollapsed,
+            typingUsers
         } = this.state;
-        const { user, isMobile } = this.props;
+        const { isMobile } = this.props;
         const onCollapse = isMobile ? this.handleOpenList : this.onCollapse;
 
         return (
             <Layout>
-                <AntHeader className={commonStyles.header}>
-                    <h3>
-                        Привет
-                        {` ${user.userLogin}`}
-                        !
-                    </h3>
-                    <LogoutIcon
-                        className={commonStyles.hoverPointer}
-                        onClick={this.handleLogOut}
-                    />
-                </AntHeader>
+                <Header onLogout={this.handleLogOut} />
                 <Layout className={commonStyles.contentContainer}>
                     <AntContent className={chatStyles.chatContainer}>
                         <div className={chatStyles.chatHeader}>
@@ -222,6 +249,7 @@ class Content extends Component {
                             />
                         </div>
                         <MessagesList
+                            typingUsers={typingUsers}
                             messagesList={messageList}
                             styles={chatStyles}
                             setInputRef={this.setmessageInputRef}

@@ -8,7 +8,9 @@ const SOCKET_API = {
     USER_LOGOUT: 'userLogout',
     USER_DISCONNECTED: 'userDisconnected',
     SEND_MESSAGE: 'sendMessage',
-    RECIEVE_MESSAGE: 'recieveMessage'
+    RECIEVE_MESSAGE: 'recieveMessage',
+    SEND_USER_TYPING: 'sendUserTiping',
+    RECIEVE_USER_TYPING: 'recieveUserTyping'
 };
 
 export default SOCKET_API;
