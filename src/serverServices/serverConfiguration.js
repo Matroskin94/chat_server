@@ -44,11 +44,14 @@ function configureServer(mongoose) {
     app.use(passport.initialize());
     app.use(passport.session());
 
+    app.set('io', io);
+    app.set('mongoose', mongoose);
+
     server.listen(8000);
 
     console.log('SERVER STARTED');
 
-    return { app, io };
+    return app;
 }
 
 module.exports = configureServer;

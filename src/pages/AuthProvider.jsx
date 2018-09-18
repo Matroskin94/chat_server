@@ -31,17 +31,13 @@ class AuthProvider extends PureComponent {
     }
 
     componentDidMount() {
-        const { onCheckAuthentication, isLoggedIn } = this.props;
+        const { onCheckAuthentication } = this.props;
 
-        if (!isLoggedIn) {
-            onCheckAuthentication().then(() => {
-                this.setState({ isWaiting: false });
-            }).catch(err => {
-                this.setState({ isWaiting: false });
-            });
-        } else {
+        onCheckAuthentication().then(() => {
             this.setState({ isWaiting: false });
-        }
+        }).catch(err => {
+            this.setState({ isWaiting: false });
+        });
     }
 
     render() {

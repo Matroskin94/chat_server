@@ -1,6 +1,7 @@
 import React, { Fragment, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import uniqueId from 'lodash/uniqueId';
+import classnames from 'classnames';
 
 import { Card, Avatar, Alert } from 'antd';
 import 'antd/lib/menu/style';
@@ -61,7 +62,11 @@ class MessagesList extends PureComponent {
                 <div ref={setInputRef} className={chatStyles.messagesContainer}>
                     {messagesList.map(mess => this.renderMessage(mess))}
                 </div>
-                <div hidden={typingUsers.length === 0} className={chatStyles.markerContainer}>
+                <div className={classnames(
+                    chatStyles.markerContainer,
+                    { [chatStyles.transparent]: typingUsers.length === 0 }
+                )}
+                >
                     <Marker />
                     <p>
                         {typingUsers.map(user => (<b key={uniqueId()}>{`${user} `}</b>))}
