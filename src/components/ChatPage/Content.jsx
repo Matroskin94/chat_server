@@ -21,7 +21,7 @@ import Header from './Header.jsx';
 
 import withUser from '../HOC/WithUser.jsx';
 
-import { TypingUser } from '../../clientServices/utils/common';
+import { TypingUser, ActionMessage, noop } from '../../clientServices/utils/common';
 
 import SOCKET_API from '../../constants/clientConstants/socketAPI';
 import API from '../../constants/clientConstants/api';
@@ -36,12 +36,16 @@ import commonStyles from './styles/commonStyles.less';
 @withSizes(({ width }) => ({ isMobile: width < 580 }))
 class Content extends Component {
     static propTypes = {
+        onCheckAuthentication: PropTypes.func,
+        logOutUser: PropTypes.func,
         user: PropTypes.object,
         isMobile: PropTypes.bool // withSizes HOC
 
     };
 
     static defaultProps = {
+        onCheckAuthentication: noop,
+        logOutUser: noop,
         user: {},
         isMobile: false
     }
@@ -69,9 +73,9 @@ class Content extends Component {
 
             socket.on(SOCKET_API.ONLINE_USERS, this.showOnlineUsers);
 
-            socket.on(SOCKET_API.CONNECTED_USER, this.showConnectedUser);
+            socket.on(SOCKET_API.CONNECTED_USER, this.showUserAction(' присоединился к беседе.'));
 
-            socket.on(SOCKET_API.USER_DISCONNECTED, this.showDisconnectedUser);
+            socket.on(SOCKET_API.USER_DISCONNECTED, this.showUserAction(' покинул к беседу.'));
 
             socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
 
@@ -181,24 +185,19 @@ class Content extends Component {
         }
     }
 
-    showConnectedUser = connectedUser => {
-        const message = {
-            isServiseMessage: true,
-            author: { userLogin: connectedUser },
-            text: ' присоедиинился к беседе'
-        };
+    showUserAction = text => actingUser => {
+        const message = new ActionMessage(actingUser, text);
+        const { user, onCheckAuthentication, logOutUser } = this.props;
 
-        this.addMessageToState(message);
-    }
-
-    showDisconnectedUser = disconnectedUser => {
-        const message = {
-            isServiseMessage: true,
-            author: { userLogin: disconnectedUser },
-            text: ' покинул к беседу'
-        };
-
-        this.addMessageToState(message);
+        if (user.userLogin === actingUser) {
+            onCheckAuthentication().then(() => {
+                this.addMessageToState(message);
+            }).catch(() => {
+                logOutUser();
+            });
+        } else {
+            this.addMessageToState(message);
+        }
     }
 
     showOnlineUsers = usersList => {

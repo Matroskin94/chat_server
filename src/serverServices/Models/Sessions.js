@@ -57,7 +57,3 @@ exports.disconnectUserTab = (mongoose, sessionId) => {
 exports.connectUserTab = (mongoose, sessionId) => {
     return updateSession(mongoose, sessionId, incrementSessionTabs);
 }
-
-exports.clearSessionCollection = (mongoose) => {
-    mongoose.connection.db.collection('sessions').remove();
-}
