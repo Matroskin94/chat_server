@@ -233,7 +233,7 @@ class Content extends Component {
 
         return (
             <Layout>
-                <Header onLogout={this.handleLogOut} />
+                <Header onLogout={this.handleLogOut} isMobile={isMobile} />
                 <Layout className={commonStyles.contentContainer}>
                     <AntContent className={chatStyles.chatContainer}>
                         <div className={chatStyles.chatHeader}>

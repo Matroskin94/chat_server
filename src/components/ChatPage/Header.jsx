@@ -3,28 +3,33 @@ import PropTypes from 'prop-types';
 import {
     Header as AntHeader
 } from 'antd/lib/layout';
+import Divider from 'antd/lib/divider';
 
 import LogoutIcon from '../common/Icons/LogoutIcon.jsx';
+import ProfileIcon from '../common/Icons/ProfileIcon.jsx';
+import HeaderMenu from './PageComponents/HeaderMenu.jsx';
 
 import withUser from '../HOC/WithUser.jsx';
 
 import { noop } from '../../clientServices/utils/common';
 
-import commonStyles from './styles/commonStyles.less';
+import headerStyles from './styles/headerStyles.less';
 
 @withUser()
 class Header extends PureComponent {
     static propTypes = {
         logOutUser: PropTypes.func, // withUser HOC
         onLogout: PropTypes.func,
-        user: PropTypes.object
+        user: PropTypes.object,
+        isMobile: PropTypes.bool
 
     };
 
     static defaultProps = {
         logOutUser: noop,
         onLogout: noop,
-        user: {}
+        user: {},
+        isMobile: false
     }
 
     handleLogOut = () => {
@@ -35,17 +40,20 @@ class Header extends PureComponent {
     }
 
     render() {
-        const { user } = this.props;
+        const { user, isMobile } = this.props;
 
         return (
-            <AntHeader className={commonStyles.header}>
-                <h3>
-                    Привет
-                    {` ${user.userLogin}`}
-                    !
-                </h3>
+            <AntHeader className={headerStyles.header}>
+                <div className={headerStyles.headerLeft}>
+                    <ProfileIcon />
+                    <h3>
+                        {` ${user.userLogin}`}
+                    </h3>
+                    <Divider type='vertical' className={headerStyles.divider} />
+                    <HeaderMenu isMobile={isMobile} />
+                </div>
                 <LogoutIcon
-                    className={commonStyles.hoverPointer}
+                    className={headerStyles.hoverPointer}
                     onClick={this.handleLogOut}
                 />
             </AntHeader>
