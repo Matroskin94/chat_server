@@ -9,4 +9,30 @@
         overflow: auto;
         height: calc(100vh - 120px);
     }
+
+    .sider :global(.ant-layout-sider-trigger) {
+        bottom: 24px;
+        height: 40px;
+        line-height: 40px;
+    }
+
+    .drawerStyles :global(.ant-drawer-wrapper-body) {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .drawerStyles :global(.ant-drawer-header) {
+        padding: 0;
+    }
+
+    .drawerStyles :global(.ant-drawer-title) {
+        padding: 0;
+    }
+
+    .drawerStyles :global(.ant-drawer-body) {
+        padding: 0;
+        background: #001529;
+        flex: 1 0 auto;
+    }
 }

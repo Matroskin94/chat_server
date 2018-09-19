@@ -1,21 +1,17 @@
-/* @import "~antd/lib/card/style/index.less";*/
-
-:global {
-    .ant-card.ant-card-bordered {
-        margin-bottom: 5px;
-    }
-
-    .ant-card.ant-card-wider-padding > .ant-card-body{
-        padding: 16px;
-    }
-};
-
 :local {
     .chatContainer {
         display: flex;
         flex-direction: column;
         height: calc(100vh - 89px);
         overflow: hidden;
+    }
+
+    .chatContainer :global( .ant-card.ant-card-bordered ) {
+        margin-bottom: 5px;
+    }
+
+    .chatContainer :global( .ant-card.ant-card-wider-padding > .ant-card-body ) {
+        padding: 16px;
     }
 
     .chatHeader {

@@ -8,6 +8,8 @@ import { noop } from '../../../../clientServices/utils/common';
 import UserList from './UserList.jsx';
 import SideBarHeader from './SideBarHeader.jsx';
 
+import sideBarStyles from './styles/sideBarSyles.less';
+
 const SideBar = ({
     usersList,
     isCollapsed,
@@ -23,6 +25,7 @@ const SideBar = ({
                     usersCount={usersList.length}
                 />
             )}
+            className={sideBarStyles.drawerStyles}
             placement='right'
             closable={false}
             onClose={handleCollapse}
