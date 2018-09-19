@@ -1,0 +1,72 @@
+:global {
+    .anticon-menu-unfold {
+        font-size: 20px;
+        color: white;
+    }
+
+    li.ant-menu-item.ant-menu-item-selected {
+        background-color: #002140;
+    }
+
+    .ant-menu-root {
+        li.ant-menu-item {
+            padding: 0 8px;
+        }
+    }
+
+    .ant-badge-count {
+        top: 12px;
+        right: 12px;
+        height: 12px;
+        line-height: 12px;
+        min-width: 12px;
+        font-size: 10px;
+        line-height: 10px;
+        box-shadow: none;
+        padding: 0 4px;
+    }
+
+    .ant-dropdown-menu-item:hover, .ant-menu-item:hover {
+        background: transparent;
+        color: #d8d0ff;
+    }
+}
+
+:local {
+    .menuContainer {
+        display: flex;
+        background: #001529;
+        border-right: none;
+    }
+
+    .menuItem {
+        display: flex;
+        color: white;
+        flex-direction: row;
+        align-items: center;
+        padding-top: 4px;
+    }
+
+    .vertical {
+        flex-direction: column;
+    }
+
+    .horizontal {
+        flex-direction: row;
+    }
+
+    .itemText {
+        margin-left: 5px;
+    }
+
+    .divider {
+        height: 1.7em;
+        top: 0;
+    }
+
+    @media (max-width: 580px) {
+        .header {
+            padding: 0 5px;
+        }
+    }
+}

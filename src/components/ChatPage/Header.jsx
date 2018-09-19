@@ -4,10 +4,13 @@ import {
     Header as AntHeader
 } from 'antd/lib/layout';
 import Divider from 'antd/lib/divider';
+import Drawer from 'antd/lib/drawer';
+// import 'antd/lib/drawer/style';
 
 import LogoutIcon from '../common/Icons/LogoutIcon.jsx';
 import ProfileIcon from '../common/Icons/ProfileIcon.jsx';
-import HeaderMenu from './PageComponents/HeaderMenu.jsx';
+import HeaderMenu from './PageComponents/HeaderMenu/HeaderMenu.jsx';
+import UserProfile from '../PageComponents/UserProfile/UserProfile.jsx';
 
 import withUser from '../HOC/WithUser.jsx';
 
@@ -32,6 +35,10 @@ class Header extends PureComponent {
         isMobile: false
     }
 
+    state = {
+        isProfileOpen: false
+    }
+
     handleLogOut = () => {
         const { logOutUser, onLogout } = this.props;
 
@@ -39,13 +46,18 @@ class Header extends PureComponent {
         logOutUser();
     }
 
+    toggleProfile = () => {
+        this.setState(prevState => ({ isProfileOpen: !prevState.isProfileOpen }));
+    }
+
     render() {
         const { user, isMobile } = this.props;
+        const { isProfileOpen } = this.state;
 
         return (
             <AntHeader className={headerStyles.header}>
                 <div className={headerStyles.headerLeft}>
-                    <ProfileIcon />
+                    <ProfileIcon onClick={this.toggleProfile} />
                     <h3>
                         {` ${user.userLogin}`}
                     </h3>
@@ -56,6 +68,15 @@ class Header extends PureComponent {
                     className={headerStyles.hoverPointer}
                     onClick={this.handleLogOut}
                 />
+                <Drawer
+                    title={user.userLogin}
+                    placement='top'
+                    closable={false}
+                    onClose={this.toggleProfile}
+                    visible={isProfileOpen}
+                >
+                    <UserProfile user={user} />
+                </Drawer>
             </AntHeader>
         );
     }
