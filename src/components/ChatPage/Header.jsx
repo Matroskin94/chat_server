@@ -11,6 +11,7 @@ import LogoutIcon from '../common/Icons/LogoutIcon.jsx';
 import ProfileIcon from '../common/Icons/ProfileIcon.jsx';
 import HeaderMenu from './PageComponents/HeaderMenu/HeaderMenu.jsx';
 import UserProfile from '../PageComponents/UserProfile/UserProfile.jsx';
+import ProfileHeader from '../PageComponents/UserProfile/ProfileHeader.jsx';
 
 import withUser from '../HOC/WithUser.jsx';
 
@@ -57,7 +58,7 @@ class Header extends PureComponent {
         return (
             <AntHeader className={headerStyles.header}>
                 <div className={headerStyles.headerLeft}>
-                    <ProfileIcon onClick={this.toggleProfile} />
+                    <ProfileIcon fill='white' onClick={this.toggleProfile} />
                     <h3>
                         {` ${user.userLogin}`}
                     </h3>
@@ -69,8 +70,9 @@ class Header extends PureComponent {
                     onClick={this.handleLogOut}
                 />
                 <Drawer
-                    title={user.userLogin}
+                    title={<ProfileHeader userLogin={user.userLogin} />}
                     placement='top'
+                    height='auto'
                     closable={false}
                     onClose={this.toggleProfile}
                     visible={isProfileOpen}
