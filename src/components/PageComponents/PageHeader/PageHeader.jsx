@@ -5,22 +5,26 @@ import {
 } from 'antd/lib/layout';
 import Divider from 'antd/lib/divider';
 
-import LogoutIcon from '../common/Icons/LogoutIcon.jsx';
-import ProfileIcon from '../common/Icons/ProfileIcon.jsx';
-import HeaderMenu from './PageComponents/HeaderMenu/HeaderMenu.jsx';
-import UserProfile from '../PageComponents/UserProfile/UserProfile.jsx';
+import LogoutIcon from '../../common/Icons/LogoutIcon.jsx';
+import ProfileIcon from '../../common/Icons/ProfileIcon.jsx';
+import HeaderMenu from '../HeaderMenu/HeaderMenu.jsx';
+import UserProfile from '../UserProfile/UserProfile.jsx';
 
-import withUser from '../HOC/WithUser.jsx';
+import withUser from '../../HOC/WithUser.jsx';
+import withSocket from '../../HOC/WithSocket.jsx';
 
-import { noop } from '../../clientServices/utils/common';
+import { noop } from '../../../clientServices/utils/common';
+
+import SOCKET_API from '../../../constants/clientConstants/socketAPI';
 
 import headerStyles from './styles/headerStyles.less';
 
+@withSocket()
 @withUser()
-class Header extends PureComponent {
+class PageHeader extends PureComponent {
     static propTypes = {
         logOutUser: PropTypes.func, // withUser HOC
-        onLogout: PropTypes.func,
+        socket: PropTypes.object,
         user: PropTypes.object,
         isMobile: PropTypes.bool
 
@@ -28,7 +32,7 @@ class Header extends PureComponent {
 
     static defaultProps = {
         logOutUser: noop,
-        onLogout: noop,
+        socket: null,
         user: {},
         isMobile: false
     }
@@ -38,9 +42,9 @@ class Header extends PureComponent {
     }
 
     handleLogOut = () => {
-        const { logOutUser, onLogout } = this.props;
+        const { logOutUser, socket } = this.props;
 
-        onLogout();
+        socket.emit(SOCKET_API.USER_LOGOUT);
         logOutUser();
     }
 
@@ -76,4 +80,4 @@ class Header extends PureComponent {
     }
 }
 
-export default Header;
+export default PageHeader;

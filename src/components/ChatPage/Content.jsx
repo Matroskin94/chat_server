@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import io from 'socket.io-client';
 import PropTypes from 'prop-types';
 import withSizes from 'react-sizes';
 import uniq from 'lodash/uniq';
@@ -17,14 +16,14 @@ import {
 
 import SideBar from './PageComponents/SideBar/SideBar.jsx';
 import MessagesList from './PageComponents/MessagesList.jsx';
-import Header from './Header.jsx';
+import PageHeader from '../PageComponents/PageHeader/PageHeader.jsx';
 
 import withUser from '../HOC/WithUser.jsx';
+import withSocket from '../HOC/WithSocket.jsx';
 
 import { TypingUser, ActionMessage, noop } from '../../clientServices/utils/common';
 
 import SOCKET_API from '../../constants/clientConstants/socketAPI';
-import API from '../../constants/clientConstants/api';
 
 import messSound from '../../assets/Message_sound.mp3';
 import servSound from '../../assets/ServiceMessage_sound.mp3';
@@ -32,6 +31,7 @@ import servSound from '../../assets/ServiceMessage_sound.mp3';
 import chatStyles from './styles/chatStyles.less';
 import commonStyles from './styles/commonStyles.less';
 
+@withSocket()
 @withUser()
 @withSizes(({ width }) => ({ isMobile: width < 580 }))
 class Content extends Component {
@@ -39,7 +39,8 @@ class Content extends Component {
         onCheckAuthentication: PropTypes.func,
         logOutUser: PropTypes.func,
         user: PropTypes.object,
-        isMobile: PropTypes.bool // withSizes HOC
+        isMobile: PropTypes.bool, // withSizes HOC,
+        socket: PropTypes.bool // withSocketHOC
 
     };
 
@@ -47,7 +48,8 @@ class Content extends Component {
         onCheckAuthentication: noop,
         logOutUser: noop,
         user: {},
-        isMobile: false
+        isMobile: false,
+        socket: null
     }
 
     state = {
@@ -63,8 +65,7 @@ class Content extends Component {
     };
 
     componentDidMount() {
-        const sock = io(API.BASE_URL);
-        const { isMobile } = this.props;
+        const { isMobile, socket: sock } = this.props;
 
         this.setState({ socket: sock, isCollapsed: isMobile }, () => {
             const { socket } = this.state;
@@ -149,12 +150,6 @@ class Content extends Component {
         });
     }
 
-    handleLogOut = () => {
-        const { socket } = this.state;
-
-        socket.emit(SOCKET_API.USER_LOGOUT);
-    }
-
     recieveUserTyping = typingUser => {
         if (typingUser.isTyping) {
             this.setState(prevState => {
@@ -233,7 +228,7 @@ class Content extends Component {
 
         return (
             <Layout>
-                <Header onLogout={this.handleLogOut} isMobile={isMobile} />
+                <PageHeader isMobile={isMobile} />
                 <Layout className={commonStyles.contentContainer}>
                     <AntContent className={chatStyles.chatContainer}>
                         <div className={chatStyles.chatHeader}>

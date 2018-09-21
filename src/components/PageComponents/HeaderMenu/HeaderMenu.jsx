@@ -9,9 +9,9 @@ import Dropdown from 'antd/lib/dropdown';
 import 'antd/lib/badge/style';
 import 'antd/lib/dropdown/style';
 
-import FriendsIcon from '../../../common/Icons/FriendsIcon.jsx';
-import MessagesIcon from '../../../common/Icons/MessagesIcon.jsx';
-import ChatsIcon from '../../../common/Icons/ChatsIcon.jsx';
+import FriendsIcon from '../../common/Icons/FriendsIcon.jsx';
+import MessagesIcon from '../../common/Icons/MessagesIcon.jsx';
+import ChatsIcon from '../../common/Icons/ChatsIcon.jsx';
 
 import headerMenuStyles from './styles/headerMenuStyles.less';
 
