@@ -88,7 +88,7 @@ HeaderMenu.propTypes = {
 
 HeaderMenu.defaultProps = {
     isMobile: false,
-    location: {},
+    location: {}
 };
 
 export default withRouter(HeaderMenu);

@@ -1,10 +1,17 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
+import Card from 'antd/lib/card';
+import Divider from 'antd/lib/divider';
 
 class Content extends PureComponent {
 
     render() {
         return (
-            <h1>MESSAGES PAGE</h1>
+            <Fragment>
+                <Divider>Сообщения</Divider>
+                <Card>
+                    <p>Card content</p>
+                </Card>
+            </Fragment>
         );
     }
 }

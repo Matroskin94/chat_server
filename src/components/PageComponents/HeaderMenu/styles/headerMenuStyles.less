@@ -24,20 +24,33 @@
         border-right: none;
     }
 
-    .menuContainer :global(.ant-menu-item.ant-menu-item-selected),
-    .menuContainer :global(.ant-menu-item.ant-menu-item-selected):hover {
+    .menuItem:global(.ant-menu-item.ant-menu-item-selected),
+    .menuItem:global(.ant-menu-item.ant-menu-item-selected):hover{
         background-color: #002140;
-        color: white;
+        span {
+            color: white;
+        }
     }
 
-    .menuContainer:global(.ant-menu-root) :global(.ant-menu-item) {
-        padding: 0 8px;
-    }
-
-    .menuContainer :global(.ant-dropdown-menu-item:hover),
-    .menuContainer :global(.ant-menu-item:hover) {
-        background: transparent;
+    .menuItem:global(.ant-menu-item):hover span, {
+        background-color: transparent;
         color: #d8d0ff;
+    }
+
+    .menuItem:global(.ant-dropdown-menu-item):hover {
+        background: transparent;
+        span {
+            color: #d8d0ff;
+        }
+    }
+
+    .menuItem:global(.ant-dropdown-menu-item-selected),
+    .menuItem:global(.ant-dropdown-menu-item-selected) a,
+    .menuItem:global(.ant-dropdown-menu-item-selected):hover {
+        background-color: #002140;
+        span {
+            color: white;
+        }
     }
 
     .menuItem {
