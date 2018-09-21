@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router';
 
 import Icon from 'antd/lib/icon';
 import Menu from 'antd/lib/menu';
@@ -13,31 +15,39 @@ import FriendsIcon from '../../common/Icons/FriendsIcon.jsx';
 import MessagesIcon from '../../common/Icons/MessagesIcon.jsx';
 import ChatsIcon from '../../common/Icons/ChatsIcon.jsx';
 
+import ROUTES from '../../../constants/clientConstants/routes';
+
 import headerMenuStyles from './styles/headerMenuStyles.less';
 
-const HeaderMenu = ({ isMobile }) => {
+const HeaderMenu = ({ isMobile, location }) => {
     const friends = (
-        <Menu.Item key='1' className={headerMenuStyles.menuItem}>
-            <Badge count={99} overflowCount={9}>
-                <FriendsIcon />
-            </Badge>
-            <span className={headerMenuStyles.itemText}>Друзья</span>
+        <Menu.Item key={ROUTES.FRIENDS} className={headerMenuStyles.menuItem}>
+            <Link to={ROUTES.FRIENDS}>
+                <Badge count={99} overflowCount={9}>
+                    <FriendsIcon />
+                </Badge>
+                <span className={headerMenuStyles.itemText}>Друзья</span>
+            </Link>
         </Menu.Item>
     );
     const messages = (
-        <Menu.Item key='2' className={headerMenuStyles.menuItem}>
-            <Badge count={99} overflowCount={9}>
-                <MessagesIcon />
-            </Badge>
-            <span className={headerMenuStyles.itemText}>Сообщения</span>
+        <Menu.Item key={ROUTES.MESSAGES} className={headerMenuStyles.menuItem}>
+            <Link to={ROUTES.MESSAGES}>
+                <Badge count={99} overflowCount={9}>
+                    <MessagesIcon />
+                </Badge>
+                <span className={headerMenuStyles.itemText}>Сообщения</span>
+            </Link>
         </Menu.Item>
     );
     const chats = (
-        <Menu.Item key='3' className={headerMenuStyles.menuItem}>
-            <Badge count={0} overflowCount={9}>
-                <ChatsIcon />
-            </Badge>
-            <span className={headerMenuStyles.itemText}>Чаты</span>
+        <Menu.Item key={ROUTES.CHAT} className={headerMenuStyles.menuItem}>
+            <Link to={ROUTES.CHAT}>
+                <Badge count={0} overflowCount={9}>
+                    <ChatsIcon />
+                </Badge>
+                <span className={headerMenuStyles.itemText}>Чаты</span>
+            </Link>
         </Menu.Item>
     );
     const menu = (
@@ -47,6 +57,7 @@ const HeaderMenu = ({ isMobile }) => {
                 { [headerMenuStyles.vertical]: isMobile },
                 { [headerMenuStyles.horizontal]: !isMobile }
             )}
+            defaultSelectedKeys={[location.pathname]}
         >
             {messages}
             {friends}
@@ -71,11 +82,13 @@ const HeaderMenu = ({ isMobile }) => {
 };
 
 HeaderMenu.propTypes = {
-    isMobile: PropTypes.bool
+    isMobile: PropTypes.bool,
+    location: PropTypes.object
 };
 
 HeaderMenu.defaultProps = {
-    isMobile: false
+    isMobile: false,
+    location: {},
 };
 
-export default HeaderMenu;
+export default withRouter(HeaderMenu);
