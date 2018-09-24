@@ -21,24 +21,18 @@ class UserProfile extends Component {
         visible: false
     }
 
-    state = {
-        redactingFields: [],
-        user: {
-            name: 'UserName',
-            surname: 'UserSurname'
-        }
-    };
-
-    componentDidMount() {
+    constructor(props) {
+        super(props);
         const { user } = this.props;
 
-        this.setState(prevState => ({
-            ...prevState,
+        this.state = {
+            redactingFields: [],
             user: {
-                ...user,
-                ...prevState.user // TODO: Убрать когда будет приходить нормальный ответ с сервера
+                name: 'UserName', // TODO: Убрать когда будет приходить нормальный ответ с сервера
+                surname: 'UserSurname', // TODO: Убрать когда будет приходить нормальный ответ с сервера
+                ...user
             }
-        }));
+        };
     }
 
     handleInputChange = (field, value) => {

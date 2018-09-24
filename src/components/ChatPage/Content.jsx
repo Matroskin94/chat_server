@@ -46,41 +46,46 @@ class Content extends Component {
         socket: null
     }
 
-    state = {
-        usersList: [],
-        message: '',
-        socket: null,
-        typingUsers: [],
-        isTyping: false,
-        messageList: [],
-        isCollapsed: false,
-        messageSound: new Audio(messSound),
-        serviceSound: new Audio(servSound)
-    };
+    constructor(props) {
+        super(props);
+        const { socket: sock, isMobile } = this.props;
+
+        this.state = {
+            usersList: [],
+            message: '',
+            socket: sock,
+            typingUsers: [],
+            isTyping: false,
+            messageList: [],
+            isCollapsed: isMobile,
+            typingTimer: null,
+            messageSound: new Audio(messSound),
+            serviceSound: new Audio(servSound)
+        };
+    }
 
     componentDidMount() {
-        const { isMobile, socket: sock } = this.props;
+        const { socket } = this.state;
 
-        this.setState({ socket: sock, isCollapsed: isMobile }, () => {
-            const { socket } = this.state;
+        socket.emit(SOCKET_API.GET_ONLINE_USERS);
 
-            socket.emit(SOCKET_API.GET_ONLINE_USERS);
+        socket.on(SOCKET_API.ONLINE_USERS, this.showOnlineUsers);
 
-            socket.on(SOCKET_API.ONLINE_USERS, this.showOnlineUsers);
+        socket.on(SOCKET_API.CONNECTED_USER, this.showUserAction(' присоединился к беседе.'));
 
-            socket.on(SOCKET_API.CONNECTED_USER, this.showUserAction(' присоединился к беседе.'));
+        socket.on(SOCKET_API.USER_DISCONNECTED, this.showUserAction(' покинул к беседу.'));
 
-            socket.on(SOCKET_API.USER_DISCONNECTED, this.showUserAction(' покинул к беседу.'));
+        socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
 
-            socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
-
-            socket.on(SOCKET_API.RECIEVE_USER_TYPING, this.recieveUserTyping);
-        });
+        socket.on(SOCKET_API.RECIEVE_USER_TYPING, this.recieveUserTyping);
 
         window.addEventListener('resize', this.updateScreenSize);
     }
 
     componentWillUnmount() {
+        const { typingTimer } = this.state;
+
+        clearTimeout(typingTimer);
         window.removeEventListener('resize', this.updateScreenSize);
     }
 
@@ -97,13 +102,16 @@ class Content extends Component {
             this.setState({ isTyping: true });
             socket.emit(SOCKET_API.SEND_USER_TYPING, userTyping);
 
-            setTimeout(() => {
+            const typingTimer = setTimeout(() => {
                 const userNotTyping = new TypingUser(user.userLogin, false);
 
                 socket.emit(SOCKET_API.SEND_USER_TYPING, userNotTyping);
                 this.setState({ isTyping: false });
             }, 4000);
+
+            this.setState({ typingTimer });
         }
+
         this.setState({
             message: e.target.value
         });
@@ -213,7 +221,7 @@ class Content extends Component {
         } = this.state;
         const { isMobile } = this.props;
         const onCollapse = isMobile ? this.handleOpenList : this.onCollapse;
-
+        console.log('CHAT_PAGE RENDER');
         return (
             <Fragment>
                 <AntContent className={chatStyles.chatContainer}>

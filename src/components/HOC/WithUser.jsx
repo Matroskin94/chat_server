@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { noop } from '../../clientServices/utils/common';
 import {
     checkAuthentication,
-    loginSuccessAction,
     logOutAction
 } from '../../clientServices/actions/ProfileActions';
 
@@ -24,7 +23,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         isAuthenticated: () => dispatch(checkAuthentication()),
-        logInUser: user => dispatch(loginSuccessAction(user)),
         logOutUser: () => dispatch(logOutAction())
     };
 }
@@ -45,11 +43,9 @@ export default () => WrappedComponent => {
         };
 
         handleAuthenticationCheck = () => {
-            const { isAuthenticated, logInUser } = this.props;
+            const { isAuthenticated } = this.props;
 
-            return isAuthenticated().then(response => {
-                logInUser(response);
-            }).catch(err => {
+            return isAuthenticated().catch(err => {
                 if (err) {
                     throw err.data;
                 } else {
