@@ -1,0 +1,17 @@
+@unreadBackground: rgba(186, 185, 196, 0.2);
+@hoverBackground: rgba(186, 185, 196, 0.5);
+
+:local {
+    .messageRow:hover, messageUnreadRow:hover {
+        cursor: pointer;
+        background-color: @hoverBackground;
+    }
+
+    .messageUnreadRow {
+        background-color: @unreadBackground;
+    }
+
+    .unreadCountContainer {
+        margin-right: 10px;
+    }
+}

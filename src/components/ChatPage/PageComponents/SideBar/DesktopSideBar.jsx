@@ -8,7 +8,7 @@ import { noop } from '../../../../clientServices/utils/common';
 import SideBarHeader from './SideBarHeader.jsx';
 import UserList from './UserList.jsx';
 
-import commonStyles from '../../styles/commonStyles.less';
+import sideBarStyles from './styles/sideBarSyles.less';
 
 const DesktopSideBar = ({
     usersList,
@@ -18,7 +18,7 @@ const DesktopSideBar = ({
 }) => {
     return (
         <Sider
-            className={commonStyles.sider}
+            className={sideBarStyles.sider}
             collapsible
             collapsed={isCollapsed}
             onCollapse={handleCollapse}

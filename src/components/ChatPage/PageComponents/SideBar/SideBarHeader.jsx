@@ -4,7 +4,7 @@ import classnames from 'classnames';
 
 import Icon from 'antd/lib/icon';
 
-import userListStyles from '../../styles/userListStyles.less';
+import userListStyles from './styles/userListStyles.less';
 
 const SideBarHeader = ({ isCollapsed, usersCount, isMobile }) => (
     <div className={

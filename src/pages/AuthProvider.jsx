@@ -50,7 +50,7 @@ class AuthProvider extends PureComponent {
             return <Loader show={Boolean(true)} />;
         }
 
-        if ((isLoggedIn) && location.pathname !== ROUTES.CHAT) {
+        if (isLoggedIn && !isClosedPage) {
             return <Redirect to={{ pathname: ROUTES.CHAT }} />;
         }
 

@@ -1,7 +1,7 @@
 import {
     FETCH_START,
     FETCH_END
-} from '../../constants/clientConstants/constants';
+} from '../../constants/clientConstants/actions';
 
 export function fetchStart() {
     return ({

@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import io from 'socket.io-client';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import withSizes from 'react-sizes';
 import uniq from 'lodash/uniq';
@@ -8,7 +7,6 @@ import {
     Content as AntContent
 } from 'antd/lib/layout';
 import {
-    Layout,
     Input,
     Form,
     Button,
@@ -17,37 +15,35 @@ import {
 
 import SideBar from './PageComponents/SideBar/SideBar.jsx';
 import MessagesList from './PageComponents/MessagesList.jsx';
-import Header from './Header.jsx';
+import MessageInput from '../PageComponents/MessageInput/MessageInput.jsx';
 
 import withUser from '../HOC/WithUser.jsx';
+import withSocket from '../HOC/WithSocket.jsx';
 
-import { TypingUser, ActionMessage, noop } from '../../clientServices/utils/common';
+import { TypingUser, ActionMessage } from '../../clientServices/utils/common';
 
 import SOCKET_API from '../../constants/clientConstants/socketAPI';
-import API from '../../constants/clientConstants/api';
 
 import messSound from '../../assets/Message_sound.mp3';
 import servSound from '../../assets/ServiceMessage_sound.mp3';
 
 import chatStyles from './styles/chatStyles.less';
-import commonStyles from './styles/commonStyles.less';
 
+@withSocket()
 @withUser()
 @withSizes(({ width }) => ({ isMobile: width < 580 }))
 class Content extends Component {
     static propTypes = {
-        onCheckAuthentication: PropTypes.func,
-        logOutUser: PropTypes.func,
         user: PropTypes.object,
-        isMobile: PropTypes.bool // withSizes HOC
+        isMobile: PropTypes.bool, // withSizes HOC,
+        socket: PropTypes.bool // withSocketHOC
 
     };
 
     static defaultProps = {
-        onCheckAuthentication: noop,
-        logOutUser: noop,
         user: {},
-        isMobile: false
+        isMobile: false,
+        socket: null
     }
 
     state = {
@@ -63,8 +59,7 @@ class Content extends Component {
     };
 
     componentDidMount() {
-        const sock = io(API.BASE_URL);
-        const { isMobile } = this.props;
+        const { isMobile, socket: sock } = this.props;
 
         this.setState({ socket: sock, isCollapsed: isMobile }, () => {
             const { socket } = this.state;
@@ -93,11 +88,7 @@ class Content extends Component {
         this.setState({ isCollapsed: collapsed });
     }
 
-    handleOpenList = () => {
-        this.setState(prevState => ({ isCollapsed: !prevState.isCollapsed }));
-    }
-
-    handleInputChange = e => {
+    onInputChange = e => {
         const { socket, isTyping } = this.state;
         const { user } = this.props;
         const userTyping = new TypingUser(user.userLogin, true);
@@ -118,7 +109,7 @@ class Content extends Component {
         });
     }
 
-    handleSendMessage = e => {
+    onSendMessage = e => {
         e.preventDefault();
         const { socket, message } = this.state;
         const { user } = this.props;
@@ -149,10 +140,8 @@ class Content extends Component {
         });
     }
 
-    handleLogOut = () => {
-        const { socket } = this.state;
-
-        socket.emit(SOCKET_API.USER_LOGOUT);
+    handleOpenList = () => {
+        this.setState(prevState => ({ isCollapsed: !prevState.isCollapsed }));
     }
 
     recieveUserTyping = typingUser => {
@@ -187,15 +176,9 @@ class Content extends Component {
 
     showUserAction = text => actingUser => {
         const message = new ActionMessage(actingUser, text);
-        const { user, onCheckAuthentication, logOutUser } = this.props;
+        const { user } = this.props;
 
-        if (user.userLogin === actingUser) {
-            onCheckAuthentication().then(() => {
-                this.addMessageToState(message);
-            }).catch(() => {
-                logOutUser();
-            });
-        } else {
+        if (user.userLogin !== actingUser) {
             this.addMessageToState(message);
         }
     }
@@ -232,53 +215,38 @@ class Content extends Component {
         const onCollapse = isMobile ? this.handleOpenList : this.onCollapse;
 
         return (
-            <Layout>
-                <Header onLogout={this.handleLogOut} />
-                <Layout className={commonStyles.contentContainer}>
-                    <AntContent className={chatStyles.chatContainer}>
-                        <div className={chatStyles.chatHeader}>
-                            <Divider>Чат Node.js</Divider>
-                            <Button
-                                hidden={!isMobile}
-                                className={chatStyles.button}
-                                onClick={this.handleOpenList}
-                                shape='circle'
-                                icon='team'
-                                type='primary'
-                            />
-                        </div>
-                        <MessagesList
-                            typingUsers={typingUsers}
-                            messagesList={messageList}
-                            styles={chatStyles}
-                            setInputRef={this.setmessageInputRef}
+            <Fragment>
+                <AntContent className={chatStyles.chatContainer}>
+                    <div className={chatStyles.chatHeader}>
+                        <Divider>Чат Node.js</Divider>
+                        <Button
+                            hidden={!isMobile}
+                            className={chatStyles.button}
+                            onClick={this.handleOpenList}
+                            shape='circle'
+                            icon='team'
+                            type='primary'
                         />
-                        <Form onSubmit={this.handleSendMessage} className={chatStyles.inputContainer}>
-                            <Input
-                                placeholder='Сообщение...'
-                                onChange={this.handleInputChange}
-                                value={message}
-                                onSubmit={this.handleSendMessage}
-                            />
-                            <Button
-                                disabled={!message}
-                                className={chatStyles.button}
-                                type='primary'
-                                shape='circle'
-                                icon='notification'
-                                onClick={this.handleSendMessage}
-                                size='default'
-                            />
-                        </Form>
-                    </AntContent>
-                    <SideBar
-                        isMobile={isMobile}
-                        isCollapsed={isCollapsed}
-                        usersList={usersList}
-                        handleCollapse={onCollapse}
+                    </div>
+                    <MessagesList
+                        typingUsers={typingUsers}
+                        messagesList={messageList}
+                        styles={chatStyles}
+                        setInputRef={this.setmessageInputRef}
                     />
-                </Layout>
-            </Layout>
+                    <MessageInput
+                        handleSendMessage={this.onSendMessage}
+                        handleInputChange={this.onInputChange}
+                        message={message}
+                    />
+                </AntContent>
+                <SideBar
+                    isMobile={isMobile}
+                    isCollapsed={isCollapsed}
+                    usersList={usersList}
+                    handleCollapse={onCollapse}
+                />
+            </Fragment>
         );
     }
 }

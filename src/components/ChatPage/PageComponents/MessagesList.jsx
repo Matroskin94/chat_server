@@ -7,7 +7,6 @@ import { Card, Avatar, Alert } from 'antd';
 import 'antd/lib/menu/style';
 
 import RenderAlert from './RenderAlert.jsx';
-// import PencilIcon from '../../common/Icons/PencilIcon.jsx';
 import Marker from '../../common/Marker/Marker.jsx';
 
 import { noop } from '../../../clientServices/utils/common';
