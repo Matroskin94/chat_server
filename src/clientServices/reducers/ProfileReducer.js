@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGIN_FAILED, LOG_OUT } from '../../constants/clientConstants/constants';
+import { LOGIN_SUCCESS, LOGIN_FAILED, LOG_OUT } from '../../constants/clientConstants/actions';
 
 const initialState = {
     _id: 0,

@@ -15,6 +15,7 @@ import {
 
 import SideBar from './PageComponents/SideBar/SideBar.jsx';
 import MessagesList from './PageComponents/MessagesList.jsx';
+import MessageInput from '../PageComponents/MessageInput/MessageInput.jsx';
 
 import withUser from '../HOC/WithUser.jsx';
 import withSocket from '../HOC/WithSocket.jsx';
@@ -87,11 +88,7 @@ class Content extends Component {
         this.setState({ isCollapsed: collapsed });
     }
 
-    handleOpenList = () => {
-        this.setState(prevState => ({ isCollapsed: !prevState.isCollapsed }));
-    }
-
-    handleInputChange = e => {
+    onInputChange = e => {
         const { socket, isTyping } = this.state;
         const { user } = this.props;
         const userTyping = new TypingUser(user.userLogin, true);
@@ -112,7 +109,7 @@ class Content extends Component {
         });
     }
 
-    handleSendMessage = e => {
+    onSendMessage = e => {
         e.preventDefault();
         const { socket, message } = this.state;
         const { user } = this.props;
@@ -141,6 +138,10 @@ class Content extends Component {
         }), () => {
             this.messageInputRef.scrollTop = this.messageInputRef.scrollHeight;
         });
+    }
+
+    handleOpenList = () => {
+        this.setState(prevState => ({ isCollapsed: !prevState.isCollapsed }));
     }
 
     recieveUserTyping = typingUser => {
@@ -233,23 +234,11 @@ class Content extends Component {
                         styles={chatStyles}
                         setInputRef={this.setmessageInputRef}
                     />
-                    <Form onSubmit={this.handleSendMessage} className={chatStyles.inputContainer}>
-                        <Input
-                            placeholder='Сообщение...'
-                            onChange={this.handleInputChange}
-                            value={message}
-                            onSubmit={this.handleSendMessage}
-                        />
-                        <Button
-                            disabled={!message}
-                            className={chatStyles.button}
-                            type='primary'
-                            shape='circle'
-                            icon='notification'
-                            onClick={this.handleSendMessage}
-                            size='default'
-                        />
-                    </Form>
+                    <MessageInput
+                        handleSendMessage={this.onSendMessage}
+                        handleInputChange={this.onInputChange}
+                        message={message}
+                    />
                 </AntContent>
                 <SideBar
                     isMobile={isMobile}

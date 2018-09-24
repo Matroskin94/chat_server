@@ -5,8 +5,10 @@ import Avatar from 'antd/lib/avatar';
 
 import FriendActions from './FriendActions.jsx';
 
+import friendActions from '../styles/friendActions.less';
+
 const FriendRow = ({ friend, actions }) => (
-    <Item>
+    <Item className={friendActions.friendRow}>
         <Item.Meta
             avatar={
                 <Avatar src='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png' />
@@ -14,7 +16,7 @@ const FriendRow = ({ friend, actions }) => (
             title={friend.userLogin}
             description={`${friend.name} ${friend.surname}`}
         />
-        <FriendActions actions={actions} />
+        <FriendActions friend={friend} actions={actions} />
     </Item>
 );
 

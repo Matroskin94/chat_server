@@ -7,6 +7,7 @@ import {
 } from 'antd';
 
 import PageHeader from '../PageHeader/PageHeader.jsx';
+import PrivateMessages from '../PrivateMessages/PrivateMessages.jsx';
 
 import commonStyles from './commonStyles.less';
 
@@ -14,7 +15,7 @@ import commonStyles from './commonStyles.less';
 @withSizes(({ width }) => ({ isMobile: width < 580 }))
 class Content extends PureComponent {
     static propTypes = {
-        children: PropTypes.element.isRequired,
+        children: PropTypes.node.isRequired,
         isMobile: PropTypes.bool // withSizes HOC,
 
     };
@@ -32,6 +33,7 @@ class Content extends PureComponent {
                 <Layout className={commonStyles.contentContainer}>
                     {children}
                 </Layout>
+                <PrivateMessages />
             </Layout>
         );
     }

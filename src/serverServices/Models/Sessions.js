@@ -7,7 +7,14 @@ const findSession = (mongoose, sessionId) => {
             if (resSession) {
                 resolve(resSession);
             }
-            reject(err);
+
+            if (err) {
+                reject(err);
+            }
+
+            if (!err && !resSession) {
+                reject('SESSION ALREADY CLOSED');
+            }
         });
     })
 }

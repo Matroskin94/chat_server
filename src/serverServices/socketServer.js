@@ -62,7 +62,7 @@ function initSocket(io, mongoose) {
                 const { userLogin } = socket.request.session.passport.user;
 
                 sessionController.disconnectUserTab(mongoose, socket.request.sessionID).then(res => {
-                    const { tabsCount } = JSON.parse(res.value.session);
+                    const { tabsCount } = res ? JSON.parse(res.value.session) : { tabsCount: -1 };
 
                     if (tabsCount === 0) {
                         return userController.isUserDisconnected(mongoose, userLogin).then(() => {
