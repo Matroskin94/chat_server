@@ -6,6 +6,7 @@ import Avatar from 'antd/lib/avatar';
 import RedactableRow from '../../common/RedactableRow/RedactableRow.jsx';
 
 import { noop } from '../../../clientServices/utils/common';
+import vkService from '../../../clientServices/services/VKService';
 
 import profileStyles from './styles/profileStyles.less';
 
@@ -24,6 +25,44 @@ class UserProfileContent extends Component {
         onRedactClick: noop
     };
 
+    state = {
+        VKuser: null
+    };
+
+    componentDidMount() {
+        vkService.getVKSession()
+            .then(res => res.mid)
+            .then(id => {
+                return vkService.getUserById(id).then(VKuser => {
+                    this.setState({ VKuser });
+                });
+            }).catch(err => {
+                console.log('ERR', err);
+            });
+    }
+
+    getUserIcon = () => {
+        const isUserLoaded = this.state.VKuser !== null;
+
+        if (!isUserLoaded) {
+            return (
+                <Avatar
+                    icon='user'
+                    size={100}
+                    className={profileStyles.avatar}
+                />);
+        }
+        const { VKuser: { photo_100 } } = this.state;
+
+        return (
+            <Avatar
+                src={photo_100}
+                size={100}
+                className={profileStyles.avatar}
+            />);
+
+    }
+
     handleInputChange = field => value => {
         const { onInputChange } = this.props;
 
@@ -41,11 +80,7 @@ class UserProfileContent extends Component {
 
         return (
             <div className={profileStyles.container}>
-                <Avatar
-                    icon='user'
-                    size={128}
-                    className={profileStyles.avatar}
-                />
+                {this.getUserIcon()}
                 <div className={profileStyles.infoContainer}>
                     <RedactableRow
                         handleInputChange={this.handleInputChange('name')}

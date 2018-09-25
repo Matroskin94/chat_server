@@ -1,0 +1,6 @@
+const VK_ERRORS = {
+    USER_NOT_FOUND: 'USER_NOT_FOUND',
+    USER_NOT_LOGGED_IN: 'USER_NOT_LOGGED_IN'
+};
+
+export default VK_ERRORS;

@@ -9,6 +9,8 @@ import {
 import PageHeader from '../PageHeader/PageHeader.jsx';
 import PrivateMessages from '../PrivateMessages/PrivateMessages.jsx';
 
+import VK_API from '../../../constants/clientConstants/vkAPI';
+
 import commonStyles from './commonStyles.less';
 
 
@@ -22,6 +24,12 @@ class Content extends PureComponent {
 
     static defaultProps = {
         isMobile: false
+    }
+
+    componentDidMount() {
+        const { VK } = window;
+
+        VK.init({ apiId: VK_API.APP_ID, access_token: VK_API.APP_TOKEN });
     }
 
     render() {
