@@ -1,39 +1,45 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Drawer from 'antd/lib/drawer';
 
 import UserProfileContent from './UserProfileContent.jsx';
 import ProfileHeader from './ProfileHeader.jsx';
 
+import { initVKAction } from '../../../clientServices/actions/ProfileActions';
+import vkService from '../../../clientServices/services/VKService';
 import { noop } from '../../../clientServices/utils/common';
 
+import profileStyles from './styles/profileStyles.less';
 
-class UserProfile extends Component {
+function mapDispatchToProps(dispatch) {
+    return {
+        initVKUser: user => dispatch(initVKAction(user))
+    };
+}
+
+@connect(null, mapDispatchToProps)
+class UserProfile extends PureComponent {
     static propTypes = {
         user: PropTypes.object,
         onClose: PropTypes.func,
-        visible: PropTypes.bool
-    }
+        visible: PropTypes.bool,
+        initVKUser: PropTypes.func
+    };
 
     static defaultProps = {
         user: {},
         onClose: noop,
-        visible: false
-    }
+        visible: false,
+        initVKUser: noop
 
-    constructor(props) {
-        super(props);
-        const { user } = this.props;
+    };
 
-        this.state = {
-            redactingFields: [],
-            user: {
-                name: 'UserName', // TODO: Убрать когда будет приходить нормальный ответ с сервера
-                surname: 'UserSurname', // TODO: Убрать когда будет приходить нормальный ответ с сервера
-                ...user
-            }
-        };
-    }
+    state = {
+        redactingFields: [],
+        VKUserId: null,
+        user: { ...this.props.user }
+    };
 
     handleInputChange = (field, value) => {
         this.setState(prevState => ({
@@ -50,10 +56,28 @@ class UserProfile extends Component {
 
         if (itemIndex > -1) {
             redactingFields.splice(itemIndex, 1);
-            this.setState({ redactingFields });
+            // TODO: save to server
+            this.setState({ redactingFields: redactingFields.slice(0) });
         } else {
             this.setState({ redactingFields: redactingFields.concat(field) });
         }
+    }
+
+    handleVKProfileClick = () => {
+        const { VKUserId } = this.state;
+
+        if (VKUserId) {
+            const { initVKUser } = this.props;
+
+            vkService.getUserById(VKUserId).then(VKuser => {
+                initVKUser(VKuser); // TODO: сохранить данные на сервере
+                this.setState(prevState => ({ user: { ...prevState.user, ...VKuser } }));
+            });
+        }
+    }
+
+    setVKId = id => {
+        this.setState({ VKUserId: id });
     }
 
     render() {
@@ -70,12 +94,15 @@ class UserProfile extends Component {
                 closable={false}
                 visible={visible}
                 onClose={onClose}
+                className={profileStyles.profileDrawer}
             >
                 <UserProfileContent
                     user={user}
                     onRedactClick={this.handleRedactClick}
                     onInputChange={this.handleInputChange}
                     redactingFields={redactingFields}
+                    handleVKProfileClick={this.handleVKProfileClick}
+                    setVKId={this.setVKId}
                 />
             </Drawer>
         );

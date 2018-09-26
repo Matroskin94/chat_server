@@ -53,7 +53,6 @@ class RedactableRow extends PureComponent {
             </div>
         );
     }
-
 }
 
 export default RedactableRow;

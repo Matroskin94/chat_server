@@ -14,7 +14,13 @@ function mapStateToProps(state) {
     return {
         user: {
             userLogin: state.profileReducer.userLogin,
-            password: state.profileReducer.password
+            password: state.profileReducer.password,
+            vkId: state.profileReducer.vkId,
+            photo50: state.profileReducer.photo50,
+            photo200orig: state.profileReducer.photo200orig,
+            photo100: state.profileReducer.photo100,
+            firstName: state.profileReducer.firstName,
+            lastName: state.profileReducer.lastName
         },
         isLoggedIn: state.profileReducer.isLoggedIn
     };

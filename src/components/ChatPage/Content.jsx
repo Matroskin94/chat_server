@@ -7,8 +7,6 @@ import {
     Content as AntContent
 } from 'antd/lib/layout';
 import {
-    Input,
-    Form,
     Button,
     Divider
 } from 'antd';

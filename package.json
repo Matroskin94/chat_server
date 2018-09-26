@@ -4,7 +4,7 @@
   "description": "Front-end part of home4u system",
   "main": "index.js",
   "scripts": {
-    "start": "set NODE_ENV=development && webpack-dev-server --mode development --port 3000",
+    "start": "set NODE_ENV=development && webpack-dev-server --mode development",
     "build": "set NODE_ENV=production && webpack --mode production",
     "lint": "./node_modules/.bin/eslint src/**",
     "lintFix": "./node_modules/.bin/eslint src/** --fix"

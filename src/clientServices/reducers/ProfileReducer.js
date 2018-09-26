@@ -1,7 +1,17 @@
-import { LOGIN_SUCCESS, LOGIN_FAILED, LOG_OUT } from '../../constants/clientConstants/actions';
+import {
+    LOGIN_SUCCESS,
+    LOG_OUT,
+    INIT_VK_USER
+} from '../../constants/clientConstants/actions';
 
 const initialState = {
     _id: 0,
+    vkId: 0,
+    photo50: '',
+    photo200orig: '',
+    photo100: '',
+    firstName: 'UserNameReduser',
+    lastName: 'UserLastnameReducer',
     password: '',
     userLogin: 'not authorized',
     isLoggedIn: false
@@ -17,17 +27,17 @@ export default function ProfileReducer(state = initialState, action) {
             };
         }
 
-        case LOGIN_FAILED: {
-            return {
-                ...state,
-                ...action.payload
-            };
-        }
-
         case LOG_OUT: {
             return {
                 ...state,
                 isLoggedIn: false
+            };
+        }
+
+        case INIT_VK_USER: {
+            return {
+                ...state,
+                ...action.payload
             };
         }
 
