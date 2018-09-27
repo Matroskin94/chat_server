@@ -26,6 +26,26 @@ class MessagesList extends PureComponent {
         typingUsers: []
     };
 
+    renderIcon = photoURL => {
+        if (!photoURL) {
+            return (
+                <Avatar
+                    shape='square'
+                    size={48}
+                    icon='user'
+                />
+            );
+        }
+
+        return (
+            <Avatar
+                shape='square'
+                size={48}
+                src={photoURL}
+            />
+        );
+    }
+
     renderMessage = message => (message.isServiseMessage ?
         (<Alert
             key={uniqueId()}
@@ -40,12 +60,7 @@ class MessagesList extends PureComponent {
                 key={uniqueId()}
             >
                 <Card.Meta
-                    avatar={
-                        <Avatar
-                            shape='square'
-                            size={48}
-                            icon='user'
-                        />}
+                    avatar={this.renderIcon(message.author.photo50)}
                     title={message.author.userLogin}
                     description={message.text}
                 />

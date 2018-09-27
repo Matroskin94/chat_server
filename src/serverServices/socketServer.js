@@ -57,6 +57,14 @@ function initSocket(io, mongoose) {
             });
         });
 
+        socket.on('updateProfile', updatedUser => {
+            socket.request.session.passport.user = updatedUser;
+            socket.request.session.save(err => {
+                socket.request.session.reload();
+            });
+            return userController.updateUser(updatedUser);
+        });
+
         socket.on('disconnecting', reason => {
             if (SERVER_MESSAGES.SESSION_DESTROYED !== reason && socket.request.session) {
                 const { userLogin } = socket.request.session.passport.user;

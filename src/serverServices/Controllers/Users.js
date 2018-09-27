@@ -42,6 +42,6 @@ exports.disconnectUser = userLogin => {
     return userModel.disconnectUser(userLogin);
 }
 
-exports.setUserTyping = user => {
-    return userModel.setUserTyping(user);
+exports.updateUser = updatedUser => {
+    return userModel.updateUser(updatedUser);
 }

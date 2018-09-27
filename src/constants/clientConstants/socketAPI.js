@@ -10,7 +10,8 @@ const SOCKET_API = {
     SEND_MESSAGE: 'sendMessage',
     RECIEVE_MESSAGE: 'recieveMessage',
     SEND_USER_TYPING: 'sendUserTiping',
-    RECIEVE_USER_TYPING: 'recieveUserTyping'
+    RECIEVE_USER_TYPING: 'recieveUserTyping',
+    UPDATE_PROFILE: 'updateProfile'
 };
 
 export default SOCKET_API;

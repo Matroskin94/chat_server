@@ -7,8 +7,6 @@ import {
     Content as AntContent
 } from 'antd/lib/layout';
 import {
-    Input,
-    Form,
     Button,
     Divider
 } from 'antd';
@@ -37,7 +35,6 @@ class Content extends Component {
         user: PropTypes.object,
         isMobile: PropTypes.bool, // withSizes HOC,
         socket: PropTypes.bool // withSocketHOC
-
     };
 
     static defaultProps = {
@@ -46,41 +43,48 @@ class Content extends Component {
         socket: null
     }
 
-    state = {
-        usersList: [],
-        message: '',
-        socket: null,
-        typingUsers: [],
-        isTyping: false,
-        messageList: [],
-        isCollapsed: false,
-        messageSound: new Audio(messSound),
-        serviceSound: new Audio(servSound)
-    };
+    constructor(props) {
+        super(props);
+        const { isMobile } = this.props;
+
+        this.state = {
+            usersList: [],
+            message: '',
+            typingUsers: [],
+            isTyping: false,
+            messageList: [],
+            isCollapsed: isMobile,
+            typingTimer: null,
+            messageSound: new Audio(messSound),
+            serviceSound: new Audio(servSound)
+        };
+    }
 
     componentDidMount() {
-        const { isMobile, socket: sock } = this.props;
+        const { socket } = this.props;
 
-        this.setState({ socket: sock, isCollapsed: isMobile }, () => {
-            const { socket } = this.state;
+        this.isComponentMounted = true;
 
-            socket.emit(SOCKET_API.GET_ONLINE_USERS);
+        socket.emit(SOCKET_API.GET_ONLINE_USERS);
 
-            socket.on(SOCKET_API.ONLINE_USERS, this.showOnlineUsers);
+        socket.on(SOCKET_API.ONLINE_USERS, this.showOnlineUsers);
 
-            socket.on(SOCKET_API.CONNECTED_USER, this.showUserAction(' присоединился к беседе.'));
+        socket.on(SOCKET_API.CONNECTED_USER, this.showUserAction(' присоединился к беседе.'));
 
-            socket.on(SOCKET_API.USER_DISCONNECTED, this.showUserAction(' покинул к беседу.'));
+        socket.on(SOCKET_API.USER_DISCONNECTED, this.showUserAction(' покинул к беседу.'));
 
-            socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
+        socket.on(SOCKET_API.RECIEVE_MESSAGE, this.addMessageToState);
 
-            socket.on(SOCKET_API.RECIEVE_USER_TYPING, this.recieveUserTyping);
-        });
+        socket.on(SOCKET_API.RECIEVE_USER_TYPING, this.recieveUserTyping);
 
         window.addEventListener('resize', this.updateScreenSize);
     }
 
     componentWillUnmount() {
+        const { typingTimer } = this.state;
+
+        this.isComponentMounted = false;
+        clearTimeout(typingTimer);
         window.removeEventListener('resize', this.updateScreenSize);
     }
 
@@ -89,21 +93,23 @@ class Content extends Component {
     }
 
     onInputChange = e => {
-        const { socket, isTyping } = this.state;
-        const { user } = this.props;
+        const { isTyping } = this.state;
+        const { socket, user } = this.props;
         const userTyping = new TypingUser(user.userLogin, true);
 
         if (!isTyping) {
-            this.setState({ isTyping: true });
             socket.emit(SOCKET_API.SEND_USER_TYPING, userTyping);
 
-            setTimeout(() => {
+            const typingTimer = setTimeout(() => {
                 const userNotTyping = new TypingUser(user.userLogin, false);
 
                 socket.emit(SOCKET_API.SEND_USER_TYPING, userNotTyping);
                 this.setState({ isTyping: false });
             }, 4000);
+
+            this.setState({ typingTimer, isTyping: true });
         }
+
         this.setState({
             message: e.target.value
         });
@@ -111,8 +117,8 @@ class Content extends Component {
 
     onSendMessage = e => {
         e.preventDefault();
-        const { socket, message } = this.state;
-        const { user } = this.props;
+        const { message } = this.state;
+        const { socket, user } = this.props;
 
         if (message.trim() === '') {
             return;
@@ -122,7 +128,8 @@ class Content extends Component {
             isServiseMessage: false,
             author: {
                 _id: user._id,
-                userLogin: user.userLogin
+                userLogin: user.userLogin,
+                photo50: user.photo50
             },
             text: message
         };
@@ -184,7 +191,9 @@ class Content extends Component {
     }
 
     showOnlineUsers = usersList => {
-        this.setState({ usersList });
+        if (this.isComponentMounted) {
+            this.setState({ usersList });
+        }
     }
 
     addMessageToState = mess => {

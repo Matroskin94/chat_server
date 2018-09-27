@@ -22,7 +22,7 @@ const FormItem = Form.Item;
 @authorization()
 class Content extends PureComponent {
     static propTypes = {
-        onLoginClick: PropTypes.func, // Функция из LoginHOC для авторизации пользователя
+        onLoginClick: PropTypes.func, // Функция из authorization для авторизации пользователя
         form: PropTypes.object,
         isFetching: PropTypes.bool // authorization HOC
     };

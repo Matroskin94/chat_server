@@ -1,11 +1,17 @@
+@bodyBackground: #e6fffb;
+
 :local {
+    .profileDrawer :global(.ant-drawer-body) {
+        background: @bodyBackground;
+    }
+
     .container {
         display: flex;
         flex-wrap: wrap;
     }
 
     .avatar {
-        min-width: 128px;
+        min-width: 100px;
         @media (max-width: 480px) {
             margin-bottom: 10px;
         }
@@ -17,5 +23,20 @@
         @media (max-width: 480px) {
             width: 100%;
         }
+    }
+
+    .infoRow {
+        display: flex;
+        min-width: 300px;
+        justify-content: space-between;
+    }
+
+    .infoRow > p {
+        font-weight: 500;
+        margin-bottom: 0;
+    }
+
+    .infoRow i {
+        cursor: pointer;
     }
 }

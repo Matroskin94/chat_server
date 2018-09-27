@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { noop } from '../../clientServices/utils/common';
 import {
     checkAuthentication,
-    loginSuccessAction,
     logOutAction
 } from '../../clientServices/actions/ProfileActions';
 
@@ -14,8 +13,15 @@ import NETWORK_ERROR from '../../constants/clientConstants/errors';
 function mapStateToProps(state) {
     return {
         user: {
+            _id: state.profileReducer._id,
             userLogin: state.profileReducer.userLogin,
-            password: state.profileReducer.password
+            password: state.profileReducer.password,
+            vkId: state.profileReducer.vkId,
+            photo50: state.profileReducer.photo50,
+            photo200orig: state.profileReducer.photo200orig,
+            photo100: state.profileReducer.photo100,
+            firstName: state.profileReducer.firstName,
+            lastName: state.profileReducer.lastName
         },
         isLoggedIn: state.profileReducer.isLoggedIn
     };
@@ -24,7 +30,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         isAuthenticated: () => dispatch(checkAuthentication()),
-        logInUser: user => dispatch(loginSuccessAction(user)),
         logOutUser: () => dispatch(logOutAction())
     };
 }
@@ -45,11 +50,9 @@ export default () => WrappedComponent => {
         };
 
         handleAuthenticationCheck = () => {
-            const { isAuthenticated, logInUser } = this.props;
+            const { isAuthenticated } = this.props;
 
-            return isAuthenticated().then(response => {
-                logInUser(response);
-            }).catch(err => {
+            return isAuthenticated().catch(err => {
                 if (err) {
                     throw err.data;
                 } else {
