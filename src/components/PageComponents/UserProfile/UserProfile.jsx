@@ -5,10 +5,13 @@ import Drawer from 'antd/lib/drawer';
 
 import UserProfileContent from './UserProfileContent.jsx';
 import ProfileHeader from './ProfileHeader.jsx';
+import withSocket from '../../HOC/WithSocket.jsx';
 
 import { initVKAction } from '../../../clientServices/actions/ProfileActions';
 import vkService from '../../../clientServices/services/VKService';
 import { noop } from '../../../clientServices/utils/common';
+
+import SOCKET_API from '../../../constants/clientConstants/socketAPI';
 
 import profileStyles from './styles/profileStyles.less';
 
@@ -18,21 +21,23 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
+@withSocket()
 @connect(null, mapDispatchToProps)
 class UserProfile extends PureComponent {
     static propTypes = {
         user: PropTypes.object,
         onClose: PropTypes.func,
         visible: PropTypes.bool,
-        initVKUser: PropTypes.func
+        initVKUser: PropTypes.func,
+        socket: PropTypes.bool // withSocketHOC
     };
 
     static defaultProps = {
         user: {},
         onClose: noop,
         visible: false,
-        initVKUser: noop
-
+        initVKUser: noop,
+        socket: null
     };
 
     state = {
@@ -51,12 +56,19 @@ class UserProfile extends PureComponent {
     }
 
     handleRedactClick = field => {
-        const { redactingFields } = this.state;
+        const { redactingFields, user: stateUser } = this.state;
+        const { user: propsUser } = this.props;
+        const { socket } = this.props;
         const itemIndex = redactingFields.indexOf(field);
 
         if (itemIndex > -1) {
             redactingFields.splice(itemIndex, 1);
-            // TODO: save to server
+            const updatedUser = {
+                ...propsUser,
+                [field]: stateUser[field]
+            };
+
+            socket.emit(SOCKET_API.UPDATE_PROFILE, updatedUser);
             this.setState({ redactingFields: redactingFields.slice(0) });
         } else {
             this.setState({ redactingFields: redactingFields.concat(field) });

@@ -35,7 +35,6 @@ class Content extends Component {
         user: PropTypes.object,
         isMobile: PropTypes.bool, // withSizes HOC,
         socket: PropTypes.bool // withSocketHOC
-
     };
 
     static defaultProps = {
@@ -46,12 +45,11 @@ class Content extends Component {
 
     constructor(props) {
         super(props);
-        const { socket: sock, isMobile } = this.props;
+        const { isMobile } = this.props;
 
         this.state = {
             usersList: [],
             message: '',
-            socket: sock,
             typingUsers: [],
             isTyping: false,
             messageList: [],
@@ -63,7 +61,9 @@ class Content extends Component {
     }
 
     componentDidMount() {
-        const { socket } = this.state;
+        const { socket } = this.props;
+
+        this.isComponentMounted = true;
 
         socket.emit(SOCKET_API.GET_ONLINE_USERS);
 
@@ -83,6 +83,7 @@ class Content extends Component {
     componentWillUnmount() {
         const { typingTimer } = this.state;
 
+        this.isComponentMounted = false;
         clearTimeout(typingTimer);
         window.removeEventListener('resize', this.updateScreenSize);
     }
@@ -92,12 +93,11 @@ class Content extends Component {
     }
 
     onInputChange = e => {
-        const { socket, isTyping } = this.state;
-        const { user } = this.props;
+        const { isTyping } = this.state;
+        const { socket, user } = this.props;
         const userTyping = new TypingUser(user.userLogin, true);
 
         if (!isTyping) {
-            this.setState({ isTyping: true });
             socket.emit(SOCKET_API.SEND_USER_TYPING, userTyping);
 
             const typingTimer = setTimeout(() => {
@@ -107,7 +107,7 @@ class Content extends Component {
                 this.setState({ isTyping: false });
             }, 4000);
 
-            this.setState({ typingTimer });
+            this.setState({ typingTimer, isTyping: true });
         }
 
         this.setState({
@@ -117,8 +117,8 @@ class Content extends Component {
 
     onSendMessage = e => {
         e.preventDefault();
-        const { socket, message } = this.state;
-        const { user } = this.props;
+        const { message } = this.state;
+        const { socket, user } = this.props;
 
         if (message.trim() === '') {
             return;
@@ -128,7 +128,8 @@ class Content extends Component {
             isServiseMessage: false,
             author: {
                 _id: user._id,
-                userLogin: user.userLogin
+                userLogin: user.userLogin,
+                photo50: user.photo50
             },
             text: message
         };
@@ -190,7 +191,9 @@ class Content extends Component {
     }
 
     showOnlineUsers = usersList => {
-        this.setState({ usersList });
+        if (this.isComponentMounted) {
+            this.setState({ usersList });
+        }
     }
 
     addMessageToState = mess => {
@@ -219,7 +222,7 @@ class Content extends Component {
         } = this.state;
         const { isMobile } = this.props;
         const onCollapse = isMobile ? this.handleOpenList : this.onCollapse;
-        console.log('CHAT_PAGE RENDER');
+
         return (
             <Fragment>
                 <AntContent className={chatStyles.chatContainer}>

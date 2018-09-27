@@ -4,6 +4,7 @@ import {
     Header as AntHeader
 } from 'antd/lib/layout';
 import Divider from 'antd/lib/divider';
+import Avatar from 'antd/lib/avatar';
 
 import LogoutIcon from '../../common/Icons/LogoutIcon.jsx';
 import ProfileIcon from '../../common/Icons/ProfileIcon.jsx';
@@ -41,6 +42,23 @@ class PageHeader extends PureComponent {
         isProfileOpen: false
     }
 
+    getProfileIcon = () => {
+        const { user } = this.props;
+
+        if (user.photo50) {
+            return (
+                <Avatar
+                    src={user.photo50}
+                    size={24}
+                    onClick={this.toggleProfile}
+                />);
+        }
+
+        return (
+            <ProfileIcon fill='white' onClick={this.toggleProfile} />
+        );
+    }
+
     handleLogOut = () => {
         const { logOutUser, socket } = this.props;
 
@@ -59,7 +77,7 @@ class PageHeader extends PureComponent {
         return (
             <AntHeader className={headerStyles.header}>
                 <div className={headerStyles.headerLeft}>
-                    <ProfileIcon fill='white' onClick={this.toggleProfile} />
+                    {this.getProfileIcon()}
                     <h3>
                         {` ${user.userLogin}`}
                     </h3>

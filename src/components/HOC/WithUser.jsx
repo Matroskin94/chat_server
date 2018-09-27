@@ -13,6 +13,7 @@ import NETWORK_ERROR from '../../constants/clientConstants/errors';
 function mapStateToProps(state) {
     return {
         user: {
+            _id: state.profileReducer._id,
             userLogin: state.profileReducer.userLogin,
             password: state.profileReducer.password,
             vkId: state.profileReducer.vkId,

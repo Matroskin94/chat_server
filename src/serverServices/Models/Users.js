@@ -1,5 +1,6 @@
 /* eslint-disable */
 const bcrypt = require('bcrypt');
+const omit = require('lodash/omit');
 
 const objectID = require('mongodb').ObjectID;
 const UserModel = require('../DataModels/UserModel');
@@ -10,12 +11,14 @@ const sessionUtils = require('../utils/sessionUtils.js');
 
 const saltRounds = 10;
 
-passport.serializeUser(function(user_id, done) {
-  done(null, user_id);
+passport.serializeUser(function(user, done) {
+    done(null, user);
 });
 
-passport.deserializeUser(function(user_id, done) {
-    done(null, user_id);
+passport.deserializeUser((user, done) => {
+    return UserModel.findById(user._id, function(err, dbUser){
+       done(err, dbUser);
+    });
 });
 
 exports.isAuthenticated = (req, cb) => {
@@ -49,11 +52,7 @@ exports.addUser = (req, cb) => {
                     ...creatingUser,
                     password: hash
                 });
-                const userCreeds = {
-                    _id: user._id,
-                    userLogin: user.userLogin,
-                    password: user.password,
-                };
+                const userCreeds = omit(user, ['password']);
 
                 req.session.tabsCount = 1;
                 req.login(userCreeds, err => {
@@ -82,11 +81,7 @@ exports.checkUser = (req, cb) => {
 
             return bcrypt.compare(enteringUser.password, resUser.password, (err, ress) => {
                 if (ress) {
-                    const userCreeds = {
-                        _id: resUser._id,
-                        userLogin: resUser.userLogin,
-                        password: resUser.password,
-                    };
+                    const userCreeds = omit(resUser, ['password']);
 
                     req.session.tabsCount = 1;
                     return req.login(userCreeds, err => {
@@ -94,7 +89,7 @@ exports.checkUser = (req, cb) => {
                             return cb({ message: SERVER_MESSAGES.AUTHORIZATION_ERROR, code: 500 }, '');
                         }
 
-                        return cb('', resUser);
+                        return cb('', omit(resUser, ['password']));
                     });
                 }
 
@@ -170,11 +165,11 @@ exports.setUserOnline = userLogin => {
     });
 }
 
-exports.setUserTyping = user => {
+exports.updateUser = updatedUser => {
     return new Promise((resolve, reject) => {
-        setTimeout(() => {
-
-        }, 2000);
+        UserModel.findByIdAndUpdate( updatedUser._id, updatedUser, (err, res) => {
+            resolve(res);
+        });
     });
 }
 

@@ -23,7 +23,7 @@
         align-items: center;
     }
 
-    .headerLeft i:hover, .menuContainer p:hover {
+    .headerLeft i:hover, .headerLeft img:hover, .menuContainer p:hover {
         cursor: pointer;
     }
 
@@ -34,5 +34,11 @@
     .divider {
         height: 1.7em;
         top: 0;
+    }
+
+    @media (max-width: 580px) {
+        .header {
+            padding: 0 5px;
+        }
     }
 }

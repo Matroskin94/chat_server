@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import io from 'socket.io-client';
 
-
 import API from '../../constants/clientConstants/api';
 
 export default () => WrappedComponent => {
