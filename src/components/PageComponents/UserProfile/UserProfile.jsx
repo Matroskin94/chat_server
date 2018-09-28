@@ -7,7 +7,7 @@ import UserProfileContent from './UserProfileContent.jsx';
 import ProfileHeader from './ProfileHeader.jsx';
 import withSocket from '../../HOC/WithSocket.jsx';
 
-import { initVKAction } from '../../../clientServices/actions/ProfileActions';
+import { updateProfileAction } from '../../../clientServices/actions/ProfileActions';
 import vkService from '../../../clientServices/services/VKService';
 import { noop } from '../../../clientServices/utils/common';
 
@@ -17,7 +17,7 @@ import profileStyles from './styles/profileStyles.less';
 
 function mapDispatchToProps(dispatch) {
     return {
-        initVKUser: user => dispatch(initVKAction(user))
+        updateProfile: user => dispatch(updateProfileAction(user))
     };
 }
 
@@ -28,7 +28,7 @@ class UserProfile extends PureComponent {
         user: PropTypes.object,
         onClose: PropTypes.func,
         visible: PropTypes.bool,
-        initVKUser: PropTypes.func,
+        updateProfile: PropTypes.func,
         socket: PropTypes.bool // withSocketHOC
     };
 
@@ -36,7 +36,7 @@ class UserProfile extends PureComponent {
         user: {},
         onClose: noop,
         visible: false,
-        initVKUser: noop,
+        updateProfile: noop,
         socket: null
     };
 
@@ -46,46 +46,75 @@ class UserProfile extends PureComponent {
         user: { ...this.props.user }
     };
 
-    handleInputChange = (field, value) => {
+    handleVKLogin = VKUserId => {
+        const { updateProfile, socket } = this.props;
+        const { user: propsUser } = this.props;
+
+        return vkService.getUserById(VKUserId).then(VKuser => {
+            const updatedProfile = {
+                ...propsUser,
+                ...VKuser
+            };
+
+            updateProfile(VKuser); // TODO: сохранить данные на сервере
+            socket.emit(SOCKET_API.UPDATE_PROFILE, updatedProfile);
+            this.setState(prevState => ({ user: { ...prevState.user, ...VKuser } }));
+        });
+    }
+
+    handleInputChange = (field, value, cb = noop) => {
         this.setState(prevState => ({
             user: {
                 ...prevState.user,
                 [field]: value
             }
-        }));
+        }), cb);
     }
 
     handleRedactClick = field => {
-        const { redactingFields, user: stateUser } = this.state;
-        const { user: propsUser } = this.props;
-        const { socket } = this.props;
+        const { redactingFields } = this.state;
         const itemIndex = redactingFields.indexOf(field);
 
         if (itemIndex > -1) {
             redactingFields.splice(itemIndex, 1);
-            const updatedUser = {
-                ...propsUser,
-                [field]: stateUser[field]
-            };
 
-            socket.emit(SOCKET_API.UPDATE_PROFILE, updatedUser);
+            this.updateProfileField(field);
             this.setState({ redactingFields: redactingFields.slice(0) });
         } else {
             this.setState({ redactingFields: redactingFields.concat(field) });
         }
     }
 
+    handleSwitchChange = field => {
+        const { user } = this.state;
+
+        this.handleInputChange(field, !user.isAvatarShow, () => {
+            this.updateProfileField(field);
+        });
+    }
+
     handleVKProfileClick = () => {
         const { VKUserId } = this.state;
 
         if (VKUserId) {
-            const { initVKUser } = this.props;
-
-            vkService.getUserById(VKUserId).then(VKuser => {
-                initVKUser(VKuser); // TODO: сохранить данные на сервере
-                this.setState(prevState => ({ user: { ...prevState.user, ...VKuser } }));
+            this.handleVKLogin(VKUserId);
+        } else {
+            vkService.loginVK().then(session => {
+                this.handleVKLogin(session.mid);
             });
         }
+    }
+
+    updateProfileField = field => {
+        const { socket, user: propsUser, updateProfile } = this.props;
+        const { user: stateUser } = this.state;
+        const updatedUser = {
+            ...propsUser,
+            [field]: stateUser[field]
+        };
+
+        updateProfile(updatedUser);
+        socket.emit(SOCKET_API.UPDATE_PROFILE, updatedUser);
     }
 
     setVKId = id => {
@@ -112,6 +141,7 @@ class UserProfile extends PureComponent {
                     user={user}
                     onRedactClick={this.handleRedactClick}
                     onInputChange={this.handleInputChange}
+                    onSwitchChange={this.handleSwitchChange}
                     redactingFields={redactingFields}
                     handleVKProfileClick={this.handleVKProfileClick}
                     setVKId={this.setVKId}

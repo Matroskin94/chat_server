@@ -8,6 +8,10 @@ class VKService {
     static getVKSession() {
         return VKRepository.getVKSession();
     }
+
+    static loginVK() {
+        return VKRepository.loginVK();
+    }
 }
 
 export default VKService;

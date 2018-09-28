@@ -1,5 +1,5 @@
 import { fetchStart, fetchEnd } from './NetworkActions';
-import { LOGIN_SUCCESS, LOG_OUT, INIT_VK_USER } from '../../constants/clientConstants/actions';
+import { LOGIN_SUCCESS, LOG_OUT, UPDATE_PROFILE } from '../../constants/clientConstants/actions';
 import ProfileService from '../services/ProfileService';
 
 export function loginSuccessAction(userData) {
@@ -19,9 +19,9 @@ export function logOutAction() {
     });
 }
 
-export function initVKAction(userData) {
+export function updateProfileAction(userData) {
     return {
-        type: INIT_VK_USER,
+        type: UPDATE_PROFILE,
         payload: userData
     };
 }

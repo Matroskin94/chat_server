@@ -129,7 +129,8 @@ class Content extends Component {
             author: {
                 _id: user._id,
                 userLogin: user.userLogin,
-                photo50: user.photo50
+                photo50: user.photo50,
+                isAvatarShow: user.isAvatarShow
             },
             text: message
         };

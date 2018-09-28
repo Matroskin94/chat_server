@@ -1,6 +1,16 @@
 import VK_ERRORS from '../../constants/clientConstants/vkErrors';
 
 class VKRepository {
+    static loginVK() {
+        const { VK } = window;
+
+        return new Promise((resolve, reject) => {
+            VK.Auth.login(res => {
+                resolve(res.session);
+            });
+        });
+    }
+
     static getUserById(id) {
         const { VK } = window;
 

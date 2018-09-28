@@ -1,10 +1,13 @@
 import {
     FETCH_START,
-    FETCH_END
+    FETCH_END,
+    INIT_SOCKET,
+    DESTROY_SOCKET
 } from '../../constants/clientConstants/actions';
 
 const initialState = {
-    isFetching: false
+    isFetching: false,
+    socket: null
 };
 
 export default function NetworkReducer(state = initialState, action) {
@@ -20,6 +23,20 @@ export default function NetworkReducer(state = initialState, action) {
             return {
                 ...state,
                 isFetching: false
+            };
+        }
+
+        case INIT_SOCKET: {
+            return {
+                ...state,
+                socket: action.payload
+            };
+        }
+
+        case DESTROY_SOCKET: {
+            return {
+                ...state,
+                socket: null
             };
         }
 
