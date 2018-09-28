@@ -186,6 +186,8 @@ class Content extends Component {
         const { user } = this.props;
 
         if (user.userLogin !== actingUser) {
+            console.log('user.userLogin ', user.userLogin );
+            console.log('actingUser',actingUser);
             this.addMessageToState(message);
         }
     }

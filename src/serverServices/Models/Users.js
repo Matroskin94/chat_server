@@ -168,7 +168,11 @@ exports.setUserOnline = userLogin => {
 exports.updateUser = updatedUser => {
     return new Promise((resolve, reject) => {
         UserModel.findByIdAndUpdate( updatedUser._id, updatedUser, (err, res) => {
-            resolve(res);
+            if (!err) {
+                resolve(res);
+            }
+
+            reject('UPDATE USER ERROR', err);
         });
     });
 }

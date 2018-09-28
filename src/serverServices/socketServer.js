@@ -60,7 +60,9 @@ function initSocket(io, mongoose) {
         socket.on('updateProfile', updatedUser => {
             socket.request.session.passport.user = updatedUser;
             socket.request.session.save(err => {
-                socket.request.session.reload();
+                if (err) {
+                    console.log('UPDATE SESSION ERROR', err);
+                }
             });
             return userController.updateUser(updatedUser);
         });

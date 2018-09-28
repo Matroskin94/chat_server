@@ -7,7 +7,7 @@ import UserProfileContent from './UserProfileContent.jsx';
 import ProfileHeader from './ProfileHeader.jsx';
 import withSocket from '../../HOC/WithSocket.jsx';
 
-import { initVKAction } from '../../../clientServices/actions/ProfileActions';
+import { updateProfileAction } from '../../../clientServices/actions/ProfileActions';
 import vkService from '../../../clientServices/services/VKService';
 import { noop } from '../../../clientServices/utils/common';
 
@@ -17,7 +17,7 @@ import profileStyles from './styles/profileStyles.less';
 
 function mapDispatchToProps(dispatch) {
     return {
-        initVKUser: user => dispatch(initVKAction(user))
+        updateProfile: user => dispatch(updateProfileAction(user))
     };
 }
 
@@ -28,7 +28,7 @@ class UserProfile extends PureComponent {
         user: PropTypes.object,
         onClose: PropTypes.func,
         visible: PropTypes.bool,
-        initVKUser: PropTypes.func,
+        updateProfile: PropTypes.func,
         socket: PropTypes.bool // withSocketHOC
     };
 
@@ -36,7 +36,7 @@ class UserProfile extends PureComponent {
         user: {},
         onClose: noop,
         visible: false,
-        initVKUser: noop,
+        updateProfile: noop,
         socket: null
     };
 
@@ -57,18 +57,19 @@ class UserProfile extends PureComponent {
 
     handleRedactClick = field => {
         const { redactingFields, user: stateUser } = this.state;
-        const { user: propsUser } = this.props;
+        const { user: propsUser, updateProfile } = this.props;
         const { socket } = this.props;
         const itemIndex = redactingFields.indexOf(field);
 
         if (itemIndex > -1) {
-            redactingFields.splice(itemIndex, 1);
             const updatedUser = {
                 ...propsUser,
                 [field]: stateUser[field]
             };
 
+            updateProfile(updatedUser);
             socket.emit(SOCKET_API.UPDATE_PROFILE, updatedUser);
+            redactingFields.splice(itemIndex, 1);
             this.setState({ redactingFields: redactingFields.slice(0) });
         } else {
             this.setState({ redactingFields: redactingFields.concat(field) });
@@ -79,10 +80,17 @@ class UserProfile extends PureComponent {
         const { VKUserId } = this.state;
 
         if (VKUserId) {
-            const { initVKUser } = this.props;
+            const { updateProfile, socket } = this.props;
+            const { user: propsUser } = this.props;
 
             vkService.getUserById(VKUserId).then(VKuser => {
-                initVKUser(VKuser); // TODO: сохранить данные на сервере
+                const updatedProfile = {
+                    ...propsUser,
+                    ...VKuser
+                };
+
+                updateProfile(VKuser); // TODO: сохранить данные на сервере
+                socket.emit(SOCKET_API.UPDATE_PROFILE, updatedProfile);
                 this.setState(prevState => ({ user: { ...prevState.user, ...VKuser } }));
             });
         }

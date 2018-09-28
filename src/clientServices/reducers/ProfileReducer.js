@@ -1,7 +1,7 @@
 import {
     LOGIN_SUCCESS,
     LOG_OUT,
-    INIT_VK_USER
+    UPDATE_PROFILE
 } from '../../constants/clientConstants/actions';
 
 const initialState = {
@@ -34,7 +34,7 @@ export default function ProfileReducer(state = initialState, action) {
             };
         }
 
-        case INIT_VK_USER: {
+        case UPDATE_PROFILE: {
             return {
                 ...state,
                 ...action.payload
