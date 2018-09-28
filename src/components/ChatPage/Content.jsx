@@ -129,7 +129,8 @@ class Content extends Component {
             author: {
                 _id: user._id,
                 userLogin: user.userLogin,
-                photo50: user.photo50
+                photo50: user.photo50,
+                isAvatarShow: user.isAvatarShow
             },
             text: message
         };
@@ -186,8 +187,6 @@ class Content extends Component {
         const { user } = this.props;
 
         if (user.userLogin !== actingUser) {
-            console.log('user.userLogin ', user.userLogin );
-            console.log('actingUser',actingUser);
             this.addMessageToState(message);
         }
     }

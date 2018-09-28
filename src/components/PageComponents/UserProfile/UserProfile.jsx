@@ -46,54 +46,75 @@ class UserProfile extends PureComponent {
         user: { ...this.props.user }
     };
 
-    handleInputChange = (field, value) => {
+    handleVKLogin = VKUserId => {
+        const { updateProfile, socket } = this.props;
+        const { user: propsUser } = this.props;
+
+        return vkService.getUserById(VKUserId).then(VKuser => {
+            const updatedProfile = {
+                ...propsUser,
+                ...VKuser
+            };
+
+            updateProfile(VKuser); // TODO: сохранить данные на сервере
+            socket.emit(SOCKET_API.UPDATE_PROFILE, updatedProfile);
+            this.setState(prevState => ({ user: { ...prevState.user, ...VKuser } }));
+        });
+    }
+
+    handleInputChange = (field, value, cb = noop) => {
         this.setState(prevState => ({
             user: {
                 ...prevState.user,
                 [field]: value
             }
-        }));
+        }), cb);
     }
 
     handleRedactClick = field => {
-        const { redactingFields, user: stateUser } = this.state;
-        const { user: propsUser, updateProfile } = this.props;
-        const { socket } = this.props;
+        const { redactingFields } = this.state;
         const itemIndex = redactingFields.indexOf(field);
 
         if (itemIndex > -1) {
-            const updatedUser = {
-                ...propsUser,
-                [field]: stateUser[field]
-            };
-
-            updateProfile(updatedUser);
-            socket.emit(SOCKET_API.UPDATE_PROFILE, updatedUser);
             redactingFields.splice(itemIndex, 1);
+
+            this.updateProfileField(field);
             this.setState({ redactingFields: redactingFields.slice(0) });
         } else {
             this.setState({ redactingFields: redactingFields.concat(field) });
         }
     }
 
+    handleSwitchChange = field => {
+        const { user } = this.state;
+
+        this.handleInputChange(field, !user.isAvatarShow, () => {
+            this.updateProfileField(field);
+        });
+    }
+
     handleVKProfileClick = () => {
         const { VKUserId } = this.state;
 
         if (VKUserId) {
-            const { updateProfile, socket } = this.props;
-            const { user: propsUser } = this.props;
-
-            vkService.getUserById(VKUserId).then(VKuser => {
-                const updatedProfile = {
-                    ...propsUser,
-                    ...VKuser
-                };
-
-                updateProfile(VKuser); // TODO: сохранить данные на сервере
-                socket.emit(SOCKET_API.UPDATE_PROFILE, updatedProfile);
-                this.setState(prevState => ({ user: { ...prevState.user, ...VKuser } }));
+            this.handleVKLogin(VKUserId);
+        } else {
+            vkService.loginVK().then(session => {
+                this.handleVKLogin(session.mid);
             });
         }
+    }
+
+    updateProfileField = field => {
+        const { socket, user: propsUser, updateProfile } = this.props;
+        const { user: stateUser } = this.state;
+        const updatedUser = {
+            ...propsUser,
+            [field]: stateUser[field]
+        };
+
+        updateProfile(updatedUser);
+        socket.emit(SOCKET_API.UPDATE_PROFILE, updatedUser);
     }
 
     setVKId = id => {
@@ -120,6 +141,7 @@ class UserProfile extends PureComponent {
                     user={user}
                     onRedactClick={this.handleRedactClick}
                     onInputChange={this.handleInputChange}
+                    onSwitchChange={this.handleSwitchChange}
                     redactingFields={redactingFields}
                     handleVKProfileClick={this.handleVKProfileClick}
                     setVKId={this.setVKId}

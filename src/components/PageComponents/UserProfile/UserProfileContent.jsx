@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import Avatar from 'antd/lib/avatar';
 import Tooltip from 'antd/lib/tooltip';
+import { Switch } from 'antd';
 
 import RedactableRow from '../../common/RedactableRow/RedactableRow.jsx';
 import VKLogoIcon from '../../common/Icons/VKLogoIcon.jsx';
@@ -19,6 +20,7 @@ class UserProfileContent extends Component {
         onInputChange: PropTypes.func,
         onRedactClick: PropTypes.func,
         handleVKProfileClick: PropTypes.func,
+        onSwitchChange: PropTypes.func,
         setVKId: PropTypes.func
     };
 
@@ -28,6 +30,7 @@ class UserProfileContent extends Component {
         onInputChange: noop,
         onRedactClick: noop,
         handleVKProfileClick: noop,
+        onSwitchChange: noop,
         setVKId: noop
     };
 
@@ -44,7 +47,7 @@ class UserProfileContent extends Component {
     getUserIcon = () => {
         const { user } = this.props;
 
-        if (user.photo100) {
+        if (user.photo100 && user.isAvatarShow) {
             return (
                 <Avatar
                     src={user.photo100}
@@ -71,6 +74,12 @@ class UserProfileContent extends Component {
         const { onRedactClick } = this.props;
 
         onRedactClick(field);
+    }
+
+    handleSwitchChange = field => () => {
+        const { onSwitchChange } = this.props;
+
+        onSwitchChange(field);
     }
 
     render() {
@@ -108,6 +117,15 @@ class UserProfileContent extends Component {
                         />
                     </div>
                     <div className={profileStyles.infoRow}>
+                        <p>Скрыть аватар: </p>
+                        <Switch
+                            checked={user.isAvatarShow}
+                            onChange={this.handleSwitchChange('isAvatarShow')}
+                            size='small'
+                        />
+                    </div>
+                    <div className={profileStyles.infoRow}>
+                        <p>Профиль ВК: </p>
                         <Tooltip placement='bottom' title='Использовать данные профиля ВК'>
                             <VKLogoIcon onClick={handleVKProfileClick} />
                         </Tooltip>

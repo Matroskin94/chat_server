@@ -21,7 +21,8 @@ function mapStateToProps(state) {
             photo200orig: state.profileReducer.photo200orig,
             photo100: state.profileReducer.photo100,
             firstName: state.profileReducer.firstName,
-            lastName: state.profileReducer.lastName
+            lastName: state.profileReducer.lastName,
+            isAvatarShow: state.profileReducer.isAvatarShow
         },
         isLoggedIn: state.profileReducer.isLoggedIn
     };

@@ -26,8 +26,8 @@ class MessagesList extends PureComponent {
         typingUsers: []
     };
 
-    renderIcon = photoURL => {
-        if (!photoURL) {
+    renderIcon = author => {
+        if (!author.photo50 || !author.isAvatarShow) {
             return (
                 <Avatar
                     shape='square'
@@ -41,7 +41,7 @@ class MessagesList extends PureComponent {
             <Avatar
                 shape='square'
                 size={48}
-                src={photoURL}
+                src={author.photo50}
             />
         );
     }
@@ -60,7 +60,7 @@ class MessagesList extends PureComponent {
                 key={uniqueId()}
             >
                 <Card.Meta
-                    avatar={this.renderIcon(message.author.photo50)}
+                    avatar={this.renderIcon(message.author)}
                     title={message.author.userLogin}
                     description={message.text}
                 />

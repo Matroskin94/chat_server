@@ -45,7 +45,7 @@ class PageHeader extends PureComponent {
     getProfileIcon = () => {
         const { user } = this.props;
 
-        if (user.photo50) {
+        if (user.photo50 && user.isAvatarShow) {
             return (
                 <Avatar
                     src={user.photo50}
