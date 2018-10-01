@@ -67,6 +67,20 @@ function initSocket(io, mongoose) {
             return userController.updateUser(updatedUser);
         });
 
+        socket.on('searchFriends', searchUser => {
+            const currentUserId = socket.request.session.passport.user._id;
+
+            userController.searchFriends(searchUser, currentUserId).then(friends => {
+                socket.emit('recieveFriends', friends);
+            });
+        });
+
+        socket.on('addToFriends', friendId => {
+            const currentUserId = socket.request.session.passport.user._id;
+
+            userController.addToFriends(currentUserId, friendId);
+        });
+
         socket.on('disconnecting', reason => {
             if (SERVER_MESSAGES.SESSION_DESTROYED !== reason && socket.request.session) {
                 const { userLogin } = socket.request.session.passport.user;

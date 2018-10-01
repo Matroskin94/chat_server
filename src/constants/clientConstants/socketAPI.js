@@ -11,7 +11,11 @@ const SOCKET_API = {
     RECIEVE_MESSAGE: 'recieveMessage',
     SEND_USER_TYPING: 'sendUserTiping',
     RECIEVE_USER_TYPING: 'recieveUserTyping',
-    UPDATE_PROFILE: 'updateProfile'
+    UPDATE_PROFILE: 'updateProfile',
+    SEARCH_FRIENDS: 'searchFriends',
+    RECIEVE_FRIENDS: 'recieveFriends',
+    ADD_TO_FRIENDS: 'addToFriends',
+    REMOVE_FROM_FRIENDS: 'removeFromFriends'
 };
 
 export default SOCKET_API;

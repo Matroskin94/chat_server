@@ -13,7 +13,8 @@ const UserSchema = new Schema({
     photo100: String,
     photo200orig: String,
     firstName: String,
-    lastName: String
+    lastName: String,
+    friendsList: Array
 });
 
 const UserModel = mongoose.model('users', UserSchema);

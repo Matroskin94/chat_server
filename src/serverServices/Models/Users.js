@@ -177,3 +177,37 @@ exports.updateUser = updatedUser => {
     });
 }
 
+exports.searchFriends = (searchStr, currentUserId) => {
+    const regExp = new RegExp(searchStr, "i");
+    const query = UserModel.find({
+        _id: { $ne: currentUserId },
+        $or: [
+            { userLogin: regExp },
+            { lastName: regExp },
+            { firstName: regExp }
+        ]
+    }).select(['-password', '-__v']);
+    const  promise = query.exec();
+
+    return  promise.catch(err => {
+        console.log('SEARCHING FRIENDS ERROR', err);
+    });
+}
+
+
+exports.addToFriends = (currentUserId, friendId) => {
+    const updateCurrentQuery = UserModel.findByIdAndUpdate(
+        currentUserId,
+        { $push: { friendsList: friendId } }
+    );
+    const updateFriendQuery = UserModel.findByIdAndUpdate(
+        friendId,
+        { $push: { friendsList: currentUserId } }
+    );
+    const promiseCurrentUser = updateCurrentQuery.exec();
+    const promiseFriend = updateFriendQuery.exec();
+
+    return  Promise.all([promiseCurrentUser, promiseFriend]).catch(err => {
+        console.log('ADDING FRIEND ERROR', err);
+    });
+}

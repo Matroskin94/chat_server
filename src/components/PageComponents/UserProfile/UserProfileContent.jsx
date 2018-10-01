@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 
 import Avatar from 'antd/lib/avatar';
 import Tooltip from 'antd/lib/tooltip';
-import { Switch } from 'antd';
+import Switch from 'antd/lib/switch';
+import 'antd/lib/switch/style';
 
 import RedactableRow from '../../common/RedactableRow/RedactableRow.jsx';
 import VKLogoIcon from '../../common/Icons/VKLogoIcon.jsx';

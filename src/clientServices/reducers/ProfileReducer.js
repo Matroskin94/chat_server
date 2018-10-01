@@ -15,7 +15,8 @@ const initialState = {
     password: '',
     userLogin: 'not authorized',
     isLoggedIn: false,
-    isAvatarShow: false
+    isAvatarShow: false,
+    friendsList: []
 };
 
 export default function ProfileReducer(state = initialState, action) {

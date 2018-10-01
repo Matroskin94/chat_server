@@ -6,6 +6,7 @@ import List from 'antd/lib/list';
 import 'antd/lib/list/style';
 
 import FriendRow from './PageComponents/FriendRow.jsx';
+import FriendSearch from './PageComponents/FriendSearch.jsx';
 
 import friendsStyles from './styles/friendsStyles.less';
 
@@ -34,7 +35,7 @@ class Content extends PureComponent {
             <Fragment>
                 <Divider>Друзья</Divider>
                 <Card className={friendsStyles.container}>
-                    <Tabs defaultActiveKey='my_friends'>
+                    <Tabs defaultActiveKey='search_friends'>
                         <TabPane tab='Мои друзья' key='my_friends'>
                             <List
                                 dataSource={friendsList}
@@ -42,7 +43,7 @@ class Content extends PureComponent {
                             />
                         </TabPane>
                         <TabPane tab='Поиск друзей' key='search_friends'>
-                            Search friends
+                            <FriendSearch />
                         </TabPane>
                     </Tabs>
                 </Card>
