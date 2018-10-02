@@ -2,11 +2,16 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import withSocket from './WithSocket.jsx';
+
 import { noop } from '../../clientServices/utils/common';
 import {
     checkAuthentication,
-    logOutAction
+    logOutAction,
+    updateProfileAction
 } from '../../clientServices/actions/ProfileActions';
+
+import SOCKET_API from '../../constants/clientConstants/socketAPI';
 
 import NETWORK_ERROR from '../../constants/clientConstants/errors';
 
@@ -32,7 +37,9 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         isAuthenticated: () => dispatch(checkAuthentication()),
-        logOutUser: () => dispatch(logOutAction())
+        logOutUser: () => dispatch(logOutAction()),
+        updateProfile: user => dispatch(updateProfileAction(user))
+
     };
 }
 
@@ -63,6 +70,15 @@ export default () => WrappedComponent => {
             });
         }
 
+        updateUser = (socket, updatingUser) => {
+            const { updateProfile } = this.props;
+
+            updateProfile(updatingUser);
+            if (socket) {
+                socket.emit(SOCKET_API.UPDATE_PROFILE, updatingUser);
+            }
+        }
+
         render() {
             const { user, logOutUser, isLoggedIn } = this.props;
 
@@ -72,6 +88,7 @@ export default () => WrappedComponent => {
                     user={user}
                     isLoggedIn={isLoggedIn}
                     logOutUser={logOutUser}
+                    updateUser={this.updateUser}
                     onCheckAuthentication={this.handleAuthenticationCheck}
                 />
             );

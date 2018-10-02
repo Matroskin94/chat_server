@@ -10,6 +10,23 @@ export function updateTimer(timerId, interval, cb) {
     return currentTimer;
 }
 
+export function getFriendsActions(userFriendsIds, friendsList) {
+    return friendsList.map(item => {
+        const actions = ['sendMessage'];
+
+        if (userFriendsIds.includes(item._id)) {
+            actions.push('removeFromFriends');
+        } else {
+            actions.push('addToFriends');
+        }
+
+        return {
+            ...item,
+            actions
+        };
+    });
+}
+
 export function TypingUser(userLogin, isTyping) {
     this.userLogin = userLogin;
     this.isTyping = isTyping;

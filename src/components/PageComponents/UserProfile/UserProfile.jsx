@@ -1,42 +1,33 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import Drawer from 'antd/lib/drawer';
 
 import UserProfileContent from './UserProfileContent.jsx';
 import ProfileHeader from './ProfileHeader.jsx';
+import withUser from '../../HOC/WithUser.jsx';
 import withSocket from '../../HOC/WithSocket.jsx';
 
-import { updateProfileAction } from '../../../clientServices/actions/ProfileActions';
 import vkService from '../../../clientServices/services/VKService';
 import { noop } from '../../../clientServices/utils/common';
 
-import SOCKET_API from '../../../constants/clientConstants/socketAPI';
-
 import profileStyles from './styles/profileStyles.less';
 
-function mapDispatchToProps(dispatch) {
-    return {
-        updateProfile: user => dispatch(updateProfileAction(user))
-    };
-}
-
+@withUser()
 @withSocket()
-@connect(null, mapDispatchToProps)
 class UserProfile extends PureComponent {
     static propTypes = {
-        user: PropTypes.object,
+        user: PropTypes.object, // withUserHOC
         onClose: PropTypes.func,
         visible: PropTypes.bool,
-        updateProfile: PropTypes.func,
-        socket: PropTypes.bool // withSocketHOC
+        updateUser: PropTypes.func, // withUserHOC,
+        socket: PropTypes.object // withSocketHOC
     };
 
     static defaultProps = {
         user: {},
         onClose: noop,
         visible: false,
-        updateProfile: noop,
+        updateUser: noop,
         socket: null
     };
 
@@ -47,8 +38,7 @@ class UserProfile extends PureComponent {
     };
 
     handleVKLogin = VKUserId => {
-        const { updateProfile, socket } = this.props;
-        const { user: propsUser } = this.props;
+        const { updateUser, user: propsUser, socket } = this.props;
 
         return vkService.getUserById(VKUserId).then(VKuser => {
             const updatedProfile = {
@@ -56,8 +46,7 @@ class UserProfile extends PureComponent {
                 ...VKuser
             };
 
-            updateProfile(VKuser); // TODO: сохранить данные на сервере
-            socket.emit(SOCKET_API.UPDATE_PROFILE, updatedProfile);
+            updateUser(socket, updatedProfile);
             this.setState(prevState => ({ user: { ...prevState.user, ...VKuser } }));
         });
     }
@@ -106,15 +95,14 @@ class UserProfile extends PureComponent {
     }
 
     updateProfileField = field => {
-        const { socket, user: propsUser, updateProfile } = this.props;
+        const { user: propsUser, updateUser, socket } = this.props;
         const { user: stateUser } = this.state;
         const updatedUser = {
             ...propsUser,
             [field]: stateUser[field]
         };
 
-        updateProfile(updatedUser);
-        socket.emit(SOCKET_API.UPDATE_PROFILE, updatedUser);
+        updateUser(socket, updatedUser);
     }
 
     setVKId = id => {

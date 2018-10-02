@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Input from 'antd/lib/input';
-import { Form } from 'antd';
+import Form from 'antd/lib/form';
 import Icon from 'antd/lib/icon';
 
 import { noop } from '../../../clientServices/utils/common';

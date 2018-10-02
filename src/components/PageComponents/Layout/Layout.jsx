@@ -2,9 +2,8 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import withSizes from 'react-sizes';
 
-import {
-    Layout
-} from 'antd';
+import Layout from 'antd/lib/layout';
+import 'antd/lib/layout/style';
 
 import PageHeader from '../PageHeader/PageHeader.jsx';
 import PrivateMessages from '../PrivateMessages/PrivateMessages.jsx';

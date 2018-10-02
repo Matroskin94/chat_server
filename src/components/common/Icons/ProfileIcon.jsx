@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon } from 'antd';
+import Icon from 'antd/lib/icon';
 
 const ProfileSVG = ({ fill }) => (
     <svg viewBox='0 20 311.541 311.541' width='1.6em' height='1.6em' fill={fill}>

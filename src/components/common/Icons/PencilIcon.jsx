@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon } from 'antd';
+import Icon from 'antd/lib/icon';
 
 const PencilSVG = ({ fill }) => (
     <svg viewBox='0 0 528.899 528.899' width='1em' height='1em'  fill={fill}>

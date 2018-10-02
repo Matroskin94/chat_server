@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from 'antd';
+import Icon from 'antd/lib/icon';
 
 const LogoutSVG = () => (
     <svg viewBox="0 0 122.775 122.776" width="1.5em" height="1.5em" fill="currentColor">

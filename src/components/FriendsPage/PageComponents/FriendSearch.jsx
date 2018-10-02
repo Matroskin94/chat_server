@@ -11,7 +11,7 @@ import withSocket from '../../HOC/WithSocket.jsx';
 import withUser from '../../HOC/WithUser.jsx';
 
 import FriendsService from '../../../clientServices/services/FriendsService';
-import { updateTimer } from '../../../clientServices/utils/common';
+import { updateTimer, getFriendsActions } from '../../../clientServices/utils/common';
 
 import SOCKET_API from '../../../constants/clientConstants/socketAPI';
 
@@ -73,28 +73,29 @@ class FriendSearch extends PureComponent {
     }
 
     handleAddFriend = friend => {
-        const { socket } = this.props;
+        const { socket, user } = this.props;
+        const { friendsList } = this.state;
+        const updatedProfile = {
+            ...user,
+            friendsList: user.friendsList.concat(friend._id)
+        };
+        const friendsWithActions = getFriendsActions(updatedProfile.friendsList, friendsList);
 
+        socket.emit(SOCKET_API.UPDATE_PROFILE, updatedProfile);
         socket.emit(SOCKET_API.ADD_TO_FRIENDS, friend._id);
+
+        this.setState({ friendsList: friendsWithActions });
+    }
+
+    handleRemoveFriend = friend => {
+        console.log('Friend', friend);
     }
 
     updateFriendList = friendsList => {
         const { user } = this.props;
-        const friendsWithActions = friendsList.map(item => {
-            const actions = ['sendMessage'];
-
-            if (user.friendsList.includes(item._id)) {
-                actions.push('removeFromFriends');
-            } else {
-                actions.push('addToFriends');
-            }
-
-            return {
-                ...item,
-                actions
-            };
-        });
-
+        const friendsWithActions = getFriendsActions(user.friendsList, friendsList);
+        console.log('friendsList', friendsList);
+        console.log('user', user);
         this.setState({ friendsList: friendsWithActions });
     }
 
@@ -123,7 +124,7 @@ class FriendSearch extends PureComponent {
                                 actions={item.actions}
                                 friend={item}
                                 onAddFriend={this.handleAddFriend}
-                                onRemoveFriend={() => {}}
+                                onRemoveFriend={this.handleRemoveFriend}
                             />)}
                     />
                     {/* <Divider>Вконтакте </Divider>

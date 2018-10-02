@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Drawer } from 'antd';
+import Drawer from 'antd/lib/drawer';
+import 'antd/lib/drawer/style';
 
 import { noop } from '../../../../clientServices/utils/common';
 

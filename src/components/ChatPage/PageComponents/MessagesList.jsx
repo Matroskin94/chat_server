@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 import uniqueId from 'lodash/uniqueId';
 import classnames from 'classnames';
 
-import { Card, Alert } from 'antd';
+import Alert from 'antd/lib/alert';
+import Card from 'antd/lib/card';
 import 'antd/lib/menu/style';
+import 'antd/lib/card/style';
+import 'antd/lib/alert/style';
 
 import RenderAlert from './RenderAlert.jsx';
 import Marker from '../../common/Marker/Marker.jsx';

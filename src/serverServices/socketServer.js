@@ -2,6 +2,8 @@
 
 const userController = require('../serverServices/Controllers/Users');
 const sessionController = require('../serverServices/Controllers/Sessions');
+const sessionUtils = require('../serverServices/utils/sessionUtils');
+
 const SERVER_MESSAGES = require('../constants/serverMessages');
 
 function initSocket(io, mongoose) {
@@ -59,11 +61,8 @@ function initSocket(io, mongoose) {
 
         socket.on('updateProfile', updatedUser => {
             socket.request.session.passport.user = updatedUser;
-            socket.request.session.save(err => {
-                if (err) {
-                    console.log('UPDATE SESSION ERROR', err);
-                }
-            });
+            sessionUtils.updateSession(socket);
+
             return userController.updateUser(updatedUser);
         });
 
@@ -78,7 +77,9 @@ function initSocket(io, mongoose) {
         socket.on('addToFriends', friendId => {
             const currentUserId = socket.request.session.passport.user._id;
 
-            userController.addToFriends(currentUserId, friendId);
+            userController.addToFriends(currentUserId, friendId).then(() => {
+                sessionUtils.updateSession(socket);
+            });
         });
 
         socket.on('disconnecting', reason => {

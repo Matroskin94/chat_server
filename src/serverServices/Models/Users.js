@@ -105,7 +105,6 @@ exports.logoutUser = (userId, cb) => {
         if (err) {
             console.log('LOGOUT ERROR', err);
         }
-        console.log('User disconnected', res);
     });
 };
 

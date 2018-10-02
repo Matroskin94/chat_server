@@ -11,7 +11,12 @@ module.exports = {
     entry: path.join(__dirname, 'src', 'App.jsx'),
     output: {
         path: path.resolve(__dirname, 'public'),
-        filename: 'bundle.js'
+        filename: '[name].[contenthash].js'
+    },
+    optimization: { // Splitting for changks for main and vendor
+        splitChunks: {
+          chunks: 'all',
+        },
     },
     plugins: [
         // new BundleAnalyzerPlugin(),

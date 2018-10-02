@@ -25,7 +25,7 @@ import headerStyles from './styles/headerStyles.less';
 class PageHeader extends PureComponent {
     static propTypes = {
         logOutUser: PropTypes.func, // withUser HOC
-        socket: PropTypes.object,
+        socket: PropTypes.object, // withSocketHOC
         user: PropTypes.object,
         isMobile: PropTypes.bool
 
