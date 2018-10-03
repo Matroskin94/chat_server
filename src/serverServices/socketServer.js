@@ -77,10 +77,18 @@ function initSocket(io, mongoose) {
         socket.on('addToFriends', friendId => {
             const currentUserId = socket.request.session.passport.user._id;
 
-            userController.addToFriends(currentUserId, friendId).then(() => {
+            userController.addToFriends(currentUserId, friendId);
+        });
+
+        socket.on('removeFromFriends', friendId => {
+            const currentUserId = socket.request.session.passport.user._id;
+
+            userController.removeFromFriends(currentUserId, friendId).then((res) => {
+
+                socket.request.session.passport.user.friendsList = res.friendsList;
                 sessionUtils.updateSession(socket);
             });
-        });
+        })
 
         socket.on('disconnecting', reason => {
             if (SERVER_MESSAGES.SESSION_DESTROYED !== reason && socket.request.session.user) {

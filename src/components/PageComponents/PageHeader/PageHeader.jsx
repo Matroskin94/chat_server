@@ -26,6 +26,7 @@ class PageHeader extends PureComponent {
     static propTypes = {
         logOutUser: PropTypes.func, // withUser HOC
         socket: PropTypes.object, // withSocketHOC
+        destroySocket: PropTypes.func, // withSocketHOC
         user: PropTypes.object,
         isMobile: PropTypes.bool
 
@@ -34,6 +35,7 @@ class PageHeader extends PureComponent {
     static defaultProps = {
         logOutUser: noop,
         socket: null,
+        destroySocket: noop,
         user: {},
         isMobile: false
     }
@@ -60,9 +62,11 @@ class PageHeader extends PureComponent {
     }
 
     handleLogOut = () => {
-        const { logOutUser, socket } = this.props;
+        const { logOutUser, socket, destroySocket } = this.props;
 
-        socket.emit(SOCKET_API.USER_LOGOUT);
+        Promise.resolve(socket.emit(SOCKET_API.USER_LOGOUT)).then(res => {
+            destroySocket();
+        });
         logOutUser();
     }
 

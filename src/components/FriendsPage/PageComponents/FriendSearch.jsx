@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import findIndex from 'lodash/findIndex'
 
 import Divider from 'antd/lib/divider';
 import List from 'antd/lib/list';
@@ -88,14 +89,22 @@ class FriendSearch extends PureComponent {
     }
 
     handleRemoveFriend = friend => {
-        console.log('Friend', friend);
+        const { friendsList } = this.state;
+        const { socket } = this.props;
+        const updatingList = JSON.parse(JSON.stringify(friendsList));
+        const friendIndex = findIndex(updatingList, ['_id', friend._id]);
+
+        updatingList[friendIndex].actions.pop();
+        updatingList[friendIndex].actions.push('addToFriends');
+        this.setState({ friendsList: updatingList });
+
+        socket.emit(SOCKET_API.REMOVE_FROM_FRIENDS, friend._id);
     }
 
     updateFriendList = friendsList => {
         const { user } = this.props;
         const friendsWithActions = getFriendsActions(user.friendsList, friendsList);
-        console.log('friendsList', friendsList);
-        console.log('user', user);
+
         this.setState({ friendsList: friendsWithActions });
     }
 
