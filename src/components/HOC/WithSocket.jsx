@@ -28,13 +28,15 @@ export default () => WrappedComponent => {
 
             if (!socket && isUserLoggedIn) {
                 initSocket(io(API.BASE_URL));
+            } else if (socket.disconnected) {
+                initSocket(io(API.BASE_URL));
             }
         }
 
         destroySocket = () => {
-            const { destroySocket, socket } = this.props;
+            const { destroySocket } = this.props;
 
-            // destroySocket();
+            destroySocket();
         }
 
         render() {

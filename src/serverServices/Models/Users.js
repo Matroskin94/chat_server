@@ -116,13 +116,14 @@ exports.getOnlineUsers = () => {
     });
 }
 
-exports.isUserDisconnected = (mongoose, userLogin) => {
-    const searchStr = `"userLogin":"${userLogin}"`;
+exports.isUserDisconnected = (mongoose, userId) => {
+    const searchStr = `"_id":"${userId}"`;
 
     return new Promise((resolve, reject) => {
         mongoose.connection.db.collection('sessions')
         .find({ session: { $regex: searchStr } }, (err, resUser) => {
             if (resUser) {
+
                 return resUser.toArray().then(res => {
                     const isDisconnected = res.every(item => {
                         if (item.session.indexOf(`"tabsCount":0`) > -1) {
@@ -132,8 +133,8 @@ exports.isUserDisconnected = (mongoose, userLogin) => {
                     });
 
                     if (isDisconnected) {
-                        return module.exports.disconnectUser(userLogin).then(() => {
-                            resolve(userLogin);
+                        return module.exports.disconnectUser(userId).then(() => {
+                            resolve();
                         });
                     }
                     reject('NOT ALL SESSIONS CLOSED');
@@ -143,9 +144,9 @@ exports.isUserDisconnected = (mongoose, userLogin) => {
     });
 }
 
-exports.disconnectUser = userLogin => {
+exports.disconnectUser = userId => {
     return new Promise((resolve, reject) => {
-        UserModel.findOneAndUpdate({ userLogin: userLogin }, { $set: { isOnline: false }})
+        UserModel.findOneAndUpdate({ _id: userId }, { $set: { isOnline: false }})
         .then(resolve)
         .catch(err => {
             reject('UPDATING USER ERROR (NOT DISCONNECTED)');

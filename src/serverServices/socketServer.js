@@ -40,18 +40,18 @@ function initSocket(io, mongoose) {
         });
 
         socket.on('userLogout', () => {
-            const { userLogin } = socket.request.session.passport.user;
+            const { userLogin, _id } = socket.request.session.passport.user;
             const { sessionID } = socket.request;
 
             socket.request.logout();
             socket.request.session.destroy(() => {
-                return userController.isUserDisconnected(mongoose, userLogin).then(() => {
+                return userController.isUserDisconnected(mongoose, _id, userLogin).then(() => {
                     socket.broadcast.emit('userDisconnected', userLogin);
                 }).catch(err => {
                     console.log(err);
                 });
             });
-            userController.disconnectUser(userLogin).then(() => {
+            userController.disconnectUser(_id).then(() => {
                 userController.getOnlineUsers().then(result => {
                     socket.broadcast.emit('onlineUsers', result);
                     socket.disconnect(true);
@@ -83,14 +83,14 @@ function initSocket(io, mongoose) {
         });
 
         socket.on('disconnecting', reason => {
-            if (SERVER_MESSAGES.SESSION_DESTROYED !== reason && socket.request.session) {
-                const { userLogin } = socket.request.session.passport.user;
+            if (SERVER_MESSAGES.SESSION_DESTROYED !== reason && socket.request.session.user) {
+                const { userLogin, _id } = socket.request.session.passport.user;
 
                 sessionController.disconnectUserTab(mongoose, socket.request.sessionID).then(res => {
                     const { tabsCount } = res ? JSON.parse(res.value.session) : { tabsCount: -1 };
 
                     if (tabsCount === 0) {
-                        return userController.isUserDisconnected(mongoose, userLogin).then(() => {
+                        return userController.isUserDisconnected(mongoose, _id).then(() => {
                             socket.broadcast.emit('userDisconnected', userLogin);
                             userController.getOnlineUsers().then(result => {
                                 socket.broadcast.emit('onlineUsers', result);
