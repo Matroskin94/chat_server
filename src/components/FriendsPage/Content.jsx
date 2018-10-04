@@ -35,7 +35,7 @@ class Content extends PureComponent {
             <Fragment>
                 <Divider>Друзья</Divider>
                 <Card className={friendsStyles.container}>
-                    <Tabs defaultActiveKey='search_friends'>
+                    <Tabs defaultActiveKey='my_friends'>
                         <TabPane tab='Мои друзья' key='my_friends'>
                             <List
                                 dataSource={friendsList}

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Item } from 'antd/lib/list';
+import Badge from 'antd/lib/badge';
+import Tooltip from 'antd/lib/tooltip'
 
 import ProfileIcon from '../../common/ProfileIcon/ProfileIcon.jsx';
 import FriendActions from './FriendActions.jsx';
@@ -8,6 +10,7 @@ import FriendActions from './FriendActions.jsx';
 import { noop } from '../../../clientServices/utils/common';
 
 import friendActions from '../styles/friendActions.less';
+import friendsStyles from '../styles/friendsStyles.less';
 
 const FriendRow = ({
     friend,
@@ -24,7 +27,18 @@ const FriendRow = ({
                     shape='circle'
                 />
             }
-            title={friend.userLogin}
+            title={
+                <Fragment>
+                    {friend.userLogin}
+                    <Tooltip placement='top' title='Онлайн'>
+                        <Badge
+                            hidden={!friend.isOnline}
+                            className={friendsStyles.nickname}
+                            status='processing'
+                        />
+                    </Tooltip>
+                </Fragment>
+            }
             description={`${friend.firstName} ${friend.lastName}`}
         />
         <FriendActions

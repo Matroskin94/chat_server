@@ -34,21 +34,7 @@ class FriendSearch extends PureComponent {
     state = {
         searchField: '',
         typingTimer: 0,
-        friendsList: [],
-        vkFriends: [ // TODO: Убрать после реализации друзей ВК
-            {
-                userLogin: 'Frank',
-                name: 'Фёдор',
-                surname: 'Васечкин'
-
-            },
-            {
-                userLogin: 'Tony',
-                name: 'Петя',
-                surname: 'Добрый'
-            }
-        ],
-        actions: ['sendMessage', 'removeFromFriends']
+        friendsList: []
     };
 
     componentDidMount() {
