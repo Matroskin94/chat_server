@@ -6,10 +6,9 @@ import uniq from 'lodash/uniq';
 import {
     Content as AntContent
 } from 'antd/lib/layout';
-import {
-    Button,
-    Divider
-} from 'antd';
+import Button from 'antd/lib/button';
+import Divider from 'antd/lib/divider';
+import 'antd/lib/divider/style';
 
 import SideBar from './PageComponents/SideBar/SideBar.jsx';
 import MessagesList from './PageComponents/MessagesList.jsx';

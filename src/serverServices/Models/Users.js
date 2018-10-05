@@ -105,7 +105,6 @@ exports.logoutUser = (userId, cb) => {
         if (err) {
             console.log('LOGOUT ERROR', err);
         }
-        console.log('User disconnected', res);
     });
 };
 
@@ -117,13 +116,14 @@ exports.getOnlineUsers = () => {
     });
 }
 
-exports.isUserDisconnected = (mongoose, userLogin) => {
-    const searchStr = `"userLogin":"${userLogin}"`;
+exports.isUserDisconnected = (mongoose, userId) => {
+    const searchStr = `"_id":"${userId}"`;
 
     return new Promise((resolve, reject) => {
         mongoose.connection.db.collection('sessions')
         .find({ session: { $regex: searchStr } }, (err, resUser) => {
             if (resUser) {
+
                 return resUser.toArray().then(res => {
                     const isDisconnected = res.every(item => {
                         if (item.session.indexOf(`"tabsCount":0`) > -1) {
@@ -133,8 +133,8 @@ exports.isUserDisconnected = (mongoose, userLogin) => {
                     });
 
                     if (isDisconnected) {
-                        return module.exports.disconnectUser(userLogin).then(() => {
-                            resolve(userLogin);
+                        return module.exports.disconnectUser(userId).then(() => {
+                            resolve();
                         });
                     }
                     reject('NOT ALL SESSIONS CLOSED');
@@ -144,9 +144,9 @@ exports.isUserDisconnected = (mongoose, userLogin) => {
     });
 }
 
-exports.disconnectUser = userLogin => {
+exports.disconnectUser = userId => {
     return new Promise((resolve, reject) => {
-        UserModel.findOneAndUpdate({ userLogin: userLogin }, { $set: { isOnline: false }})
+        UserModel.findOneAndUpdate({ _id: userId }, { $set: { isOnline: false }})
         .then(resolve)
         .catch(err => {
             reject('UPDATING USER ERROR (NOT DISCONNECTED)');
@@ -177,3 +177,68 @@ exports.updateUser = updatedUser => {
     });
 }
 
+exports.searchFriends = (searchStr, currentUserId) => {
+    const regExp = new RegExp(searchStr, "i");
+    const query = UserModel.find({
+        _id: { $ne: currentUserId },
+        $or: [
+            { userLogin: regExp },
+            { lastName: regExp },
+            { firstName: regExp }
+        ]
+    }).select(['-password', '-__v']);
+    const  promise = query.exec();
+
+    return  promise.catch(err => {
+        console.log('SEARCHING FRIENDS ERROR', err);
+    });
+}
+
+
+exports.addToFriends = (currentUserId, friendId) => {
+    const updateCurrentQuery = UserModel.findByIdAndUpdate(
+        currentUserId,
+        { $push: { friendsList: friendId } }
+    );
+    const updateFriendQuery = UserModel.findByIdAndUpdate(
+        friendId,
+        { $push: { friendsList: currentUserId } }
+    );
+    const promiseFriend = updateFriendQuery.exec();
+    const promiseUser = updateCurrentQuery.exec();
+
+    return  Promise.all([promiseFriend, promiseUser]).catch(err => {
+        console.log('ADDING FRIEND ERROR', err);
+    });
+}
+
+exports.removeFromFriends = (currentUserId, friendId) => {
+    const updateCurrentQuery = UserModel.findByIdAndUpdate(
+        currentUserId,
+        { $pull: { friendsList: friendId }},
+        { new: true }
+    );
+    const updateFriendQuery = UserModel.findByIdAndUpdate(
+        friendId,
+        { $pull: { friendsList: currentUserId }}
+    );
+    const promiseCurrentUser = updateCurrentQuery.exec();
+    const promiseFriend = updateFriendQuery.exec().then(() => promiseCurrentUser);
+
+    return  promiseCurrentUser.catch(err => {
+        console.log('REMOVING FRIEND ERROR', err);
+    });
+}
+
+exports.getFriendsList = friendsIds => {
+    const getFriendsQuery = UserModel.find(
+        { _id: { $in: friendsIds } },
+        { password: 0, __v: 0 }
+    );
+
+    const promiseGetFriends = getFriendsQuery.exec();
+
+    return promiseGetFriends.catch(err => {
+        console.log('GET FRIENDs ERROR', err);
+    });
+}

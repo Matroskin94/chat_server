@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from 'antd';
+import Icon from 'antd/lib/icon';
 
 const MessagesSVG = () => (
     <svg viewBox="0 0 437.212 400.212" width="1.3em" height="1.3em" fill="currentColor">

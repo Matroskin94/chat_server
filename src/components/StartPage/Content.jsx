@@ -2,13 +2,12 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import {
-    Form,
-    Icon,
-    Input,
-    Button,
-    Card
-} from 'antd';
+import Form from 'antd/lib/form';
+import Icon from 'antd/lib/icon';
+import Input from 'antd/lib/input';
+import Button from 'antd/lib/button';
+import Card from 'antd/lib/card';
+import 'antd/lib/form/style';
 
 import authorization from '../HOC/Authorization.jsx';
 import Loader from '../common/Loader/Loader.jsx';

@@ -8,3 +8,11 @@ exports.decrementTab = sess => {
 
     return sess;
 }
+
+exports.updateSession = socket => {
+    socket.request.session.save(err => {
+        if (err) {
+            console.log('UPDATE SESSION ERROR', err);
+        }
+    });
+}

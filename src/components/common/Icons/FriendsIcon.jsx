@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from 'antd';
+import Icon from 'antd/lib/icon';
 
 const FriendsSVG = () => (
     <svg viewBox='0 0 512 512' width='1.3em' height='1.3em' fill="currentColor">

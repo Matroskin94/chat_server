@@ -45,3 +45,19 @@ exports.disconnectUser = userLogin => {
 exports.updateUser = updatedUser => {
     return userModel.updateUser(updatedUser);
 }
+
+exports.searchFriends = (searchStr, currentUserId) => {
+    return userModel.searchFriends(searchStr, currentUserId);
+}
+
+exports.addToFriends = (currentUserId, friendId) => {
+    return userModel.addToFriends(currentUserId, friendId);
+}
+
+exports.removeFromFriends = (currentUserId, friendId) => {
+    return userModel.removeFromFriends(currentUserId, friendId);
+}
+
+exports.getFriendsList = friendsIds => {
+    return userModel.getFriendsList(friendsIds);
+}

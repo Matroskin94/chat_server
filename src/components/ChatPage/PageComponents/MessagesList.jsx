@@ -3,11 +3,15 @@ import PropTypes from 'prop-types';
 import uniqueId from 'lodash/uniqueId';
 import classnames from 'classnames';
 
-import { Card, Avatar, Alert } from 'antd';
+import Alert from 'antd/lib/alert';
+import Card from 'antd/lib/card';
 import 'antd/lib/menu/style';
+import 'antd/lib/card/style';
+import 'antd/lib/alert/style';
 
 import RenderAlert from './RenderAlert.jsx';
 import Marker from '../../common/Marker/Marker.jsx';
+import ProfileIcon from '../../common/ProfileIcon/ProfileIcon.jsx';
 
 import { noop } from '../../../clientServices/utils/common';
 
@@ -26,26 +30,6 @@ class MessagesList extends PureComponent {
         typingUsers: []
     };
 
-    renderIcon = author => {
-        if (!author.photo50 || !author.isAvatarShow) {
-            return (
-                <Avatar
-                    shape='square'
-                    size={48}
-                    icon='user'
-                />
-            );
-        }
-
-        return (
-            <Avatar
-                shape='square'
-                size={48}
-                src={author.photo50}
-            />
-        );
-    }
-
     renderMessage = message => (message.isServiseMessage ?
         (<Alert
             key={uniqueId()}
@@ -60,7 +44,7 @@ class MessagesList extends PureComponent {
                 key={uniqueId()}
             >
                 <Card.Meta
-                    avatar={this.renderIcon(message.author)}
+                    avatar={<ProfileIcon size={48} user={message.author} />}
                     title={message.author.userLogin}
                     description={message.text}
                 />

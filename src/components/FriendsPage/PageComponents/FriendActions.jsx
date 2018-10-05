@@ -12,17 +12,32 @@ import { noop } from '../../../clientServices/utils/common';
 import { openMessagesDrawer } from '../../../clientServices/actions/NotificationActions';
 
 import COLOR from '../../../constants/clientConstants/colors';
+import COMMON from '../../../constants/clientConstants/common';
 
 import friendActionsStyle from '../styles/friendActions.less';
 
-const FriendActions = ({ actions, friend, openDrawer }) => {
+const FriendActions = ({
+    actions,
+    friend,
+    openDrawer, // open throw store
+    onAddFriend,
+    onRemoveFriend
+}) => {
     const handleSendMessage = () => {
         openDrawer(friend);
     };
 
+    const handleAddToFriends = () => {
+        onAddFriend(friend);
+    };
+
+    const handleRemoveFromFriends = () => {
+        onRemoveFriend(friend);
+    };
+
     return (
         <div className={friendActionsStyle.actionsContainer}>
-            { actions.includes('sendMessage') ? (
+            { actions.includes(COMMON.SEND_MESSAGE) ? (
                 <Tooltip title='Отправить сообщение'>
                     <SendMessageIcon
                         onClick={handleSendMessage}
@@ -35,18 +50,20 @@ const FriendActions = ({ actions, friend, openDrawer }) => {
             { actions.length > 1 ? (
                 <Divider className={friendActionsStyle.actionsDivider} type='vertical' />
             ) : null}
-            { actions.includes('addToFriends') ? (
+            { actions.includes(COMMON.ADD_TO_FRIENDS) ? (
                 <Tooltip title='Добавить в друзья'>
                     <AddFriendIcon
+                        onClick={handleAddToFriends}
                         fill={COLOR.GRAY}
                         height='1.4em'
                         width='1.4em'
                     />
                 </Tooltip>
             ) : null}
-            { actions.includes('removeFromFriends') ? (
+            { actions.includes(COMMON.REMOVE_FROM_FRIENDS) ? (
                 <Tooltip title='Убрать из друзей'>
                     <RemoveFriendIcon
+                        onClick={handleRemoveFromFriends}
                         fill={COLOR.GRAY}
                         height='1.4em'
                         width='1.4em'
@@ -60,13 +77,17 @@ const FriendActions = ({ actions, friend, openDrawer }) => {
 FriendActions.propTypes = {
     actions: PropTypes.array,
     friend: PropTypes.object,
-    openDrawer: PropTypes.func
+    openDrawer: PropTypes.func,
+    onAddFriend: PropTypes.func,
+    onRemoveFriend: PropTypes.func
 };
 
 FriendActions.defaultProps = {
     actions: [],
     friend: {},
-    openDrawer: noop
+    openDrawer: noop,
+    onAddFriend: noop,
+    onRemoveFriend: noop
 };
 
 function mapDispatchToProps(dispatch) {

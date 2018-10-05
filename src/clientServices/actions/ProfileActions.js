@@ -1,5 +1,10 @@
 import { fetchStart, fetchEnd } from './NetworkActions';
-import { LOGIN_SUCCESS, LOG_OUT, UPDATE_PROFILE } from '../../constants/clientConstants/actions';
+import {
+    LOGIN_SUCCESS,
+    LOG_OUT,
+    UPDATE_PROFILE,
+    UPDATE_USER_FRIENDS
+} from '../../constants/clientConstants/actions';
 import ProfileService from '../services/ProfileService';
 
 export function loginSuccessAction(userData) {
@@ -23,6 +28,13 @@ export function updateProfileAction(userData) {
     return {
         type: UPDATE_PROFILE,
         payload: userData
+    };
+}
+
+export function updateFriendsAction(friends) {
+    return {
+        type: UPDATE_USER_FRIENDS,
+        payload: friends
     };
 }
 
