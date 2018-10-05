@@ -12,6 +12,7 @@ import { noop } from '../../../clientServices/utils/common';
 import { openMessagesDrawer } from '../../../clientServices/actions/NotificationActions';
 
 import COLOR from '../../../constants/clientConstants/colors';
+import COMMON from '../../../constants/clientConstants/common';
 
 import friendActionsStyle from '../styles/friendActions.less';
 
@@ -36,7 +37,7 @@ const FriendActions = ({
 
     return (
         <div className={friendActionsStyle.actionsContainer}>
-            { actions.includes('sendMessage') ? (
+            { actions.includes(COMMON.SEND_MESSAGE) ? (
                 <Tooltip title='Отправить сообщение'>
                     <SendMessageIcon
                         onClick={handleSendMessage}
@@ -49,7 +50,7 @@ const FriendActions = ({
             { actions.length > 1 ? (
                 <Divider className={friendActionsStyle.actionsDivider} type='vertical' />
             ) : null}
-            { actions.includes('addToFriends') ? (
+            { actions.includes(COMMON.ADD_TO_FRIENDS) ? (
                 <Tooltip title='Добавить в друзья'>
                     <AddFriendIcon
                         onClick={handleAddToFriends}
@@ -59,7 +60,7 @@ const FriendActions = ({
                     />
                 </Tooltip>
             ) : null}
-            { actions.includes('removeFromFriends') ? (
+            { actions.includes(COMMON.REMOVE_FROM_FRIENDS) ? (
                 <Tooltip title='Убрать из друзей'>
                     <RemoveFriendIcon
                         onClick={handleRemoveFromFriends}

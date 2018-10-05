@@ -57,3 +57,7 @@ exports.addToFriends = (currentUserId, friendId) => {
 exports.removeFromFriends = (currentUserId, friendId) => {
     return userModel.removeFromFriends(currentUserId, friendId);
 }
+
+exports.getFriendsList = friendsIds => {
+    return userModel.getFriendsList(friendsIds);
+}

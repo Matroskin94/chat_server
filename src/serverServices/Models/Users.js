@@ -196,13 +196,18 @@ exports.searchFriends = (searchStr, currentUserId) => {
 
 
 exports.addToFriends = (currentUserId, friendId) => {
+    const updateCurrentQuery = UserModel.findByIdAndUpdate(
+        currentUserId,
+        { $push: { friendsList: friendId } }
+    );
     const updateFriendQuery = UserModel.findByIdAndUpdate(
         friendId,
         { $push: { friendsList: currentUserId } }
     );
     const promiseFriend = updateFriendQuery.exec();
+    const promiseUser = updateCurrentQuery.exec();
 
-    return  promiseFriend.catch(err => {
+    return  Promise.all([promiseFriend, promiseUser]).catch(err => {
         console.log('ADDING FRIEND ERROR', err);
     });
 }
@@ -222,5 +227,18 @@ exports.removeFromFriends = (currentUserId, friendId) => {
 
     return  promiseCurrentUser.catch(err => {
         console.log('REMOVING FRIEND ERROR', err);
+    });
+}
+
+exports.getFriendsList = friendsIds => {
+    const getFriendsQuery = UserModel.find(
+        { _id: { $in: friendsIds } },
+        { password: 0, __v: 0 }
+    );
+
+    const promiseGetFriends = getFriendsQuery.exec();
+
+    return promiseGetFriends.catch(err => {
+        console.log('GET FRIENDs ERROR', err);
     });
 }

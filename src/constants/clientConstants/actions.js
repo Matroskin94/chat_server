@@ -8,6 +8,7 @@ export const LOGIN_FAILED = 'LOGIN_FAILED';
 export const LOG_OUT = 'LOG_OUT';
 export const UPDATE_PROFILE = 'UPDATE_PROFILE';
 export const CLEAR_VK_USER = 'CLEAR_VK_USER';
+export const UPDATE_USER_FRIENDS = 'UPDATE_USER_FRIENDS';
 
 export const OPEN_MESSAGES = 'OPEN_MESSAGES';
 export const CLOSE_MESSAGES = 'CLOSE_MESSAGES';

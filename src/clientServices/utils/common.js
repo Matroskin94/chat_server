@@ -1,3 +1,5 @@
+import COMMON from '../../constants/clientConstants/common';
+
 export const noop = () => {};
 
 export function updateTimer(timerId, interval, cb) {
@@ -12,12 +14,12 @@ export function updateTimer(timerId, interval, cb) {
 
 export function getFriendsActions(userFriendsIds, friendsList) {
     return friendsList.map(item => {
-        const actions = ['sendMessage'];
+        const actions = [COMMON.SEND_MESSAGE];
 
         if (userFriendsIds.includes(item._id)) {
-            actions.push('removeFromFriends');
+            actions.push(COMMON.REMOVE_FROM_FRIENDS);
         } else {
-            actions.push('addToFriends');
+            actions.push(COMMON.ADD_TO_FRIENDS);
         }
 
         return {

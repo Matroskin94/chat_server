@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Item } from 'antd/lib/list';
 import Badge from 'antd/lib/badge';
-import Tooltip from 'antd/lib/tooltip'
+import Tooltip from 'antd/lib/tooltip';
 
 import ProfileIcon from '../../common/ProfileIcon/ProfileIcon.jsx';
 import FriendActions from './FriendActions.jsx';

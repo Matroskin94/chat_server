@@ -77,7 +77,7 @@ function initSocket(io, mongoose) {
         socket.on('addToFriends', friendId => {
             const currentUserId = socket.request.session.passport.user._id;
 
-            userController.addToFriends(currentUserId, friendId);
+            return userController.addToFriends(currentUserId, friendId);
         });
 
         socket.on('removeFromFriends', friendId => {
@@ -88,7 +88,19 @@ function initSocket(io, mongoose) {
                 socket.request.session.passport.user.friendsList = res.friendsList;
                 sessionUtils.updateSession(socket);
             });
-        })
+        });
+
+        socket.on('getUserFriends', (userId = 0) => {
+            if (!userId) {
+                const { friendsList } = socket.request.session.passport.user;
+
+                userController.getFriendsList(friendsList).then(friends => {
+
+                    socket.emit('recieveUserFriends', friends);
+                });
+            }
+            // TODO: Функцию для выборки друзей по id пользователя назвать getFriendsIds
+        });
 
         socket.on('disconnecting', reason => {
             if (SERVER_MESSAGES.SESSION_DESTROYED !== reason && socket.request.session.user) {
