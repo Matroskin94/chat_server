@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import withSizes from 'react-sizes';
 import uniq from 'lodash/uniq';
+import { connect } from 'react-redux';
 
 import {
     Content as AntContent
@@ -18,6 +19,7 @@ import withUser from '../HOC/WithUser.jsx';
 import withSocket from '../HOC/WithSocket.jsx';
 
 import { TypingUser, ActionMessage } from '../../clientServices/utils/common';
+import { addChatMessageAction } from '../../clientServices/actions/ChatActions';
 
 import SOCKET_API from '../../constants/clientConstants/socketAPI';
 
@@ -26,6 +28,19 @@ import servSound from '../../assets/ServiceMessage_sound.mp3';
 
 import chatStyles from './styles/chatStyles.less';
 
+function mapStateToProps(state) {
+    return {
+        messageList: state.chatReducer.chatMessages
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        addChatMessage: message => dispatch(addChatMessageAction(message))
+    }
+}
+
+@connect(mapStateToProps, mapDispatchToProps)
 @withSocket()
 @withUser()
 @withSizes(({ width }) => ({ isMobile: width < 580 }))
@@ -51,7 +66,6 @@ class Content extends Component {
             message: '',
             typingUsers: [],
             isTyping: false,
-            messageList: [],
             isCollapsed: isMobile,
             typingTimer: null,
             messageSound: new Audio(messSound),
@@ -117,7 +131,12 @@ class Content extends Component {
     onSendMessage = e => {
         e.preventDefault();
         const { message } = this.state;
-        const { socket, user } = this.props;
+        const { socket, user, addChatMessage } = this.props;
+        const date = new Date();
+        const sendTime = {
+            date: date.toLocaleDateString(),
+            time: date.toLocaleTimeString()
+        }
 
         if (message.trim() === '') {
             return;
@@ -131,16 +150,17 @@ class Content extends Component {
                 photo50: user.photo50,
                 isAvatarShow: user.isAvatarShow
             },
+            sendTime,
             text: message
         };
         const userNotTyping = new TypingUser(user.userLogin, false);
 
         socket.emit(SOCKET_API.SEND_USER_TYPING, userNotTyping);
         socket.emit(SOCKET_API.SEND_MESSAGE, messageObj);
+        addChatMessage(messageObj);
 
         this.setState(prevState => ({
             isTyping: false,
-            messageList: prevState.messageList.concat(messageObj),
             message: ''
         }), () => {
             this.messageInputRef.scrollTop = this.messageInputRef.scrollHeight;
@@ -198,29 +218,27 @@ class Content extends Component {
 
     addMessageToState = mess => {
         const { messageSound, serviceSound } = this.state;
+        const { addChatMessage } = this.props;
 
-        this.setState(prevState => ({
-            messageList: prevState.messageList.concat(mess)
-        }), () => {
-            this.messageInputRef.scrollTop = this.messageInputRef.scrollHeight;
+        addChatMessage(mess);
 
-            if (mess.isServiseMessage) {
-                serviceSound.play();
-            } else {
-                messageSound.play();
-            }
-        });
+        this.messageInputRef.scrollTop = this.messageInputRef.scrollHeight;
+
+        if (mess.isServiseMessage) {
+            serviceSound.play();
+        } else {
+            messageSound.play();
+        }
     }
 
     render() {
         const {
             message,
-            messageList,
             usersList,
             isCollapsed,
             typingUsers
         } = this.state;
-        const { isMobile } = this.props;
+        const { isMobile, messageList } = this.props;
         const onCollapse = isMobile ? this.handleOpenList : this.onCollapse;
 
         return (

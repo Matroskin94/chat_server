@@ -45,7 +45,12 @@ class MessagesList extends PureComponent {
             >
                 <Card.Meta
                     avatar={<ProfileIcon size={48} user={message.author} />}
-                    title={message.author.userLogin}
+                    title={
+                        <div className={chatStyles.messageHeader}>
+                            {message.author.userLogin}
+                            <span>{message.sendTime.date + ' | ' + message.sendTime.time}</span>
+                        </div>
+                    }
                     description={message.text}
                 />
             </Card>
