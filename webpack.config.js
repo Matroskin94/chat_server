@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const Dotenv = require('dotenv-webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-const PRODUCTION_MODE = process.env.NODE_ENV.trim() === 'production';
+// const PRODUCTION_MODE = process.env.NODE_ENV.trim() === 'production';
 
 module.exports = {
     entry: path.join(__dirname, 'src', 'App.jsx'),
