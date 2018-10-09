@@ -3,6 +3,7 @@
 const userController = require('../serverServices/Controllers/Users');
 const sessionController = require('../serverServices/Controllers/Sessions');
 const sessionUtils = require('../serverServices/utils/sessionUtils');
+const DialogHandler = require('../serverServices/RequestsHandlers/DialogHandler');
 
 const SERVER_MESSAGES = require('../constants/serverMessages');
 
@@ -101,6 +102,8 @@ function initSocket(io, mongoose) {
             }
             // TODO: Функцию для выборки друзей по id пользователя назвать getFriendsIds
         });
+
+        socket.on('getConversation', DialogHandler.bindSocket(socket, 'handleGetConversation'));
 
         socket.on('disconnecting', reason => {
             if (SERVER_MESSAGES.SESSION_DESTROYED !== reason && socket.request.session.user) {

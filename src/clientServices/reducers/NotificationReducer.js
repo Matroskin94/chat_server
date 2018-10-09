@@ -1,3 +1,5 @@
+import omit from 'lodash/omit';
+
 import {
     OPEN_MESSAGES,
     CLOSE_MESSAGES
@@ -5,7 +7,9 @@ import {
 
 const initialState = {
     isMessagesOpen: false,
-    messageRecipient: {}
+    modalType: '',
+    messageRecipient: {},
+    dialogId: ''
 };
 
 export default function NotificationReducer(state = initialState, action) {
@@ -13,7 +17,8 @@ export default function NotificationReducer(state = initialState, action) {
         case OPEN_MESSAGES: {
             return {
                 ...state,
-                messageRecipient: action.payload,
+                ...omit(action.payload, ['modalType']),
+                modalType: action.payload.modalType,
                 isMessagesOpen: true
             };
         }

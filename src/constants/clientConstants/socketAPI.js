@@ -17,7 +17,8 @@ const SOCKET_API = {
     ADD_TO_FRIENDS: 'addToFriends',
     REMOVE_FROM_FRIENDS: 'removeFromFriends',
     GET_USER_FRIENDS: 'getUserFriends',
-    RECIEVE_USER_FRIENDS: 'recieveUserFriends'
+    RECIEVE_USER_FRIENDS: 'recieveUserFriends',
+    GET_CONVERSATION: 'getConversation'
 };
 
 export default SOCKET_API;

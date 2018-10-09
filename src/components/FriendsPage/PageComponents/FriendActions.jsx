@@ -13,6 +13,7 @@ import { openMessagesDrawer } from '../../../clientServices/actions/Notification
 
 import COLOR from '../../../constants/clientConstants/colors';
 import COMMON from '../../../constants/clientConstants/common';
+import MODAL_TYPE from '../../../constants/clientConstants/modalTypes';
 
 import friendActionsStyle from '../styles/friendActions.less';
 
@@ -24,7 +25,11 @@ const FriendActions = ({
     onRemoveFriend
 }) => {
     const handleSendMessage = () => {
-        openDrawer(friend);
+        openDrawer({
+            modalType: MODAL_TYPE.DIALOG_FROM_LIST,
+            messageRecipient: friend,
+            dialogId: null
+        });
     };
 
     const handleAddToFriends = () => {

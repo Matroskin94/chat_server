@@ -3,7 +3,7 @@ import {
     CLOSE_MESSAGES
 } from '../../constants/clientConstants/actions';
 
-export function openMessagesDrawer(messageRecipient) {
+export function openMessagesDrawer(messageRecipient, dialogId = null) {
     return ({
         payload: messageRecipient,
         type: OPEN_MESSAGES

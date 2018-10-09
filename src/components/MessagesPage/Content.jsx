@@ -13,6 +13,8 @@ import {
 } from '../../clientServices/actions/NotificationActions';
 import { noop } from '../../clientServices/utils/common';
 
+import MODAL_TYPE from '../../constants/clientConstants/modalTypes';
+
 import commonMessagesTyles from './styles/commonMessagesStyles.less';
 
 const messagesMock = [
@@ -48,7 +50,11 @@ class Content extends PureComponent {
     onMessageClick = message => () => {
         const { openDrawer } = this.props;
 
-        openDrawer(message.userLogin); // TODO: передать _id пользователя
+        openDrawer({
+            modalType: MODAL_TYPE.DIALOG_FROM_PRIVATE,
+            messageRecipient: null,
+            dialogId: 'dialog_id' // TODO: передать _id диалога и тип dialog: true
+        });
     }
 
     render() {

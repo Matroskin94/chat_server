@@ -7,6 +7,7 @@ import Drawer from 'antd/lib/drawer';
 import MessageInput from '../MessageInput/MessageInput.jsx';
 
 import MessageList from './PageComponents/MessageList.jsx';
+import withSocket from '../../HOC/WithSocket.jsx';
 
 import privateMessageStyles from './styles/privateMessagesStyle.less';
 
@@ -56,26 +57,45 @@ function mapStateToProps(state) {
     return {
         isMessagesOpen: state.notificationReducer.isMessagesOpen,
         messageRecipient: state.notificationReducer.messageRecipient,
-        currentUser: {
-            _id: state.profileReducer._id
-        }
+        dialogId: state.notificationReducer.dialogId,
+        modalType: state.notificationReducer.modalType,
+        currentUserId: state.profileReducer._id
     };
 }
 
+@withSocket()
 @connect(mapStateToProps, mapDispatchToProps)
 class PrivateMessages extends PureComponent {
     static propTypes = {
         closeDrawer: PropTypes.func,
-        isMessagesOpen: PropTypes.bool
+        isMessagesOpen: PropTypes.bool,
+        messageRecipient: PropTypes.object,
+        dialogId: PropTypes.string,
+        socket: PropTypes.object
     };
 
     static defaultProps = {
         closeDrawer: noop,
-        isMessagesOpen: false
+        isMessagesOpen: false,
+        messageRecipient: {},
+        dialogId: '',
+        socket: {}
     };
 
     state = {
         message: ''
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        const { isMessagesOpen } = props;
+
+        if (isMessagesOpen) {
+            const { messageRecipient, modalType, socket, currentUserId } = props;
+
+            socket.emit('getConversation', currentUserId, messageRecipient._id);
+        }
+
+        return null;
     }
 
     onSendMessage = e => {
